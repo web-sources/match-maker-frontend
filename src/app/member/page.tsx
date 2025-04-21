@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MemberFilters } from "./MemberFilters";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import MemberCard from "./MemberCard";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface MemberFiltersProps {
   minAge?: number;
@@ -19,10 +22,58 @@ interface MemberFiltersProps {
   distanceFromUser?: number;
 }
 
+interface PersonalDetails {
+  gender: string;
+  relationship_goal: string;
+  languages_spoken: string[] | null;
+  profile_picture: string;
+}
+
+interface Member {
+  id: string;
+  first_name: string;
+  last_name: string;
+  city_name: string;
+  country_name: string;
+  personal_details: PersonalDetails;
+}
+
 const MemberPage = () => {
   const [activeFilters, setActiveFilters] = useState<
     Partial<MemberFiltersProps>
   >({});
+  const router = useRouter();
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const { accessToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [memberData, setMemberData] = useState<Member[]>([]);
+
+  useEffect(() => {
+    try {
+      const fetchMembers = async () => {
+        setIsLoading(true);
+
+        const response = await axios.get(
+          `${BASE_URL}/api/v1/startup/fun/community/`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setMemberData(response.data.results);
+        }
+      };
+      fetchMembers();
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [router, BASE_URL, accessToken]);
 
   const handleApplyFilters = (filters: MemberFiltersProps) => {
     console.log("Applying filters:", filters);
@@ -38,93 +89,6 @@ const MemberPage = () => {
   const clearAllFilters = () => {
     setActiveFilters({});
   };
-
-  const sampleMembers = [
-    {
-      name: "Ava Johnson",
-      location: "New York, USA",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=1",
-    },
-    {
-      name: "Liam Smith",
-      location: "London, UK",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=10",
-    },
-    {
-      name: "Noah Chen",
-      location: "Toronto, Canada",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=3",
-    },
-    {
-      name: "Sophia Lee",
-      location: "Seoul, South Korea",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=12",
-    },
-    {
-      name: "Ethan Patel",
-      location: "Mumbai, India",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=5",
-    },
-    {
-      name: "Isabella Gomez",
-      location: "Madrid, Spain",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=26",
-    },
-    {
-      name: "Lucas Müller",
-      location: "Berlin, Germany",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=27",
-    },
-    {
-      name: "Mia Rossi",
-      location: "Rome, Italy",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=28",
-    },
-    {
-      name: "Isabella Gomez",
-      location: "Madrid, Spain",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=36",
-    },
-    {
-      name: "Lucas Müller",
-      location: "Berlin, Germany",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=47",
-    },
-    {
-      name: "Mia Rossi",
-      location: "Rome, Italy",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=58",
-    },
-    {
-      name: "Isabella Gomez",
-      location: "Madrid, Spain",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=36",
-    },
-    {
-      name: "Lucas Müller",
-      location: "Berlin, Germany",
-      gender: "male",
-      profilePhoto: "https://i.pravatar.cc/150?img=7",
-    },
-    {
-      name: "Mia Rossi",
-      location: "Rome, Italy",
-      gender: "female",
-      profilePhoto: "https://i.pravatar.cc/150?img=20",
-    },
-  ];
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
@@ -212,11 +176,32 @@ const MemberPage = () => {
       )}
 
       {/* Member list would go here */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {sampleMembers.map((member, idx) => (
-          <MemberCard key={idx} {...member} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="w-full flex justify-center py-10">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mb-4" />
+            <p className="text-pink-500 text-sm font-medium">
+              Loading members...
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {memberData.map((member, idx) => (
+            <MemberCard
+              key={idx}
+              name={`${member.first_name} ${member.last_name}`}
+              location={`${member.city_name}, ${member.country_name}`}
+              profilePhoto={
+                member.personal_details?.profile_picture || "/fallback.jpg"
+              }
+              gender={member.personal_details?.gender}
+              relationship_goal={member.personal_details?.relationship_goal}
+              languages_spoken={member.personal_details?.languages_spoken || []}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

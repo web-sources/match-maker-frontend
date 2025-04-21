@@ -49,6 +49,8 @@ const RegisterPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,7 +65,7 @@ const RegisterPage = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.post(
-        `localhost:3000/api/v1/startup/auth/register/`,
+        `${BASE_URL}/api/v1/startup/auth/register/`,
         data,
         {
           headers: {

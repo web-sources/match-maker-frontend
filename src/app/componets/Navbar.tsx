@@ -18,12 +18,26 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
-export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+export function Navbar() {
+  const { accessToken, logout, isprofile_complete } = useAuth();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // Return nothing until mounted
+  }
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <nav className="top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -61,29 +75,49 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
-            {isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <button className="relative p-1 text-gray-600 hover:text-rose-500 transition-colors">
-                  <MessageSquare className="h-6 w-6" />
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-xs text-white flex items-center justify-center">
-                    3
-                  </span>
-                </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Avatar className="h-8 w-8 cursor-pointer border-2 border-rose-500 transition-transform hover:scale-105">
-                      <AvatarImage src="https://randomuser.me/api/portraits/women/44.jpg" />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
-                    <DropdownMenuItem>Logout</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+            {accessToken ? (
+              isprofile_complete ? (
+                // ✅ Profile is complete — show normal logged-in UI
+                <div className="flex items-center space-x-4">
+                  <button className="relative p-1 text-gray-600 hover:text-rose-500 transition-colors">
+                    <MessageSquare className="h-6 w-6" />
+                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-xs text-white flex items-center justify-center">
+                      3
+                    </span>
+                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="h-8 w-8 cursor-pointer border-2 border-rose-500 transition-transform hover:scale-105">
+                        <AvatarImage src="https://randomuser.me/api/portraits/women/44.jpg" />
+                        <AvatarFallback>U</AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => router.push("/profile")}>
+                        Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/settings")}
+                      >
+                        Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={logout}>
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                // ❗ Profile incomplete — show Complete Profile button
+                <Button
+                  onClick={() => router.push("/onboarding")}
+                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                >
+                  Complete Profile
+                </Button>
+              )
             ) : (
+              // ❌ Not logged in — show login/signup
               <>
                 <Link href="/login">
                   <Button
@@ -94,7 +128,7 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r cursor cursor-pointer from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-md">
+                  <Button className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-md  cursor cursor-pointer">
                     Sign Up
                   </Button>
                 </Link>
@@ -113,7 +147,7 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                   <NavItem icon={<Home />} text="Home" href="/" />
                   <NavItem icon={<Users />} text="Members" href="/member" />
                   <NavItem icon={<BookOpen />} text="Stories" href="/stories" />
-                  <NavItem icon={<Star />} text="Reviews" href="/reivew" />
+                  <NavItem icon={<Star />} text="Reviews" href="/review" />
                 </div>
               </SheetContent>
             </Sheet>
