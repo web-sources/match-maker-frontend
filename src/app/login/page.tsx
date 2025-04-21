@@ -16,10 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, Heart, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ForgotPasswordModal from "./ForgotPassowordModel";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -33,6 +35,10 @@ const formSchema = z.object({
 export default function LoginPage() {
   const [showpassword, setShowpassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const { login, accessToken, isprofile_complete } = useAuth();
+
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,10 +50,20 @@ export default function LoginPage() {
 
   const { isSubmitting } = form.formState;
 
+  useEffect(() => {
+    if (accessToken) {
+      if (!isprofile_complete) {
+        router.push("/onboarding");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [accessToken, router]);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.post(
-        `localhost:3000/api/v1/startup/auth/login/`,
+        `${BASE_URL}/api/v1/startup/auth/login/`,
         data,
         {
           headers: {
@@ -58,8 +74,15 @@ export default function LoginPage() {
       );
 
       if (response.status === 200) {
-        toast.success(response.data.data || "Login successful!");
-        console.log(response);
+        const access_token = response?.data?.token?.access;
+        const { is_admin, is_vip, is_profile, is_user } = response?.data;
+        login(access_token, is_admin, is_profile, is_vip, is_user);
+
+        if (!is_profile) {
+          router.push("/onboarding");
+        } else {
+          router.push("/");
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -218,7 +241,10 @@ export default function LoginPage() {
 
           <div className="mt-4 text-center text-sm text-gray-600">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-medium text-rose-500 hover:text-rose-600">
+            <Link
+              href="/register"
+              className="font-medium text-rose-500 hover:text-rose-600"
+            >
               Sign up
             </Link>
           </div>
