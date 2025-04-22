@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { MemberFilters } from "./MemberFilters";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Heart, X } from "lucide-react";
 import MemberCard from "./MemberCard";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
@@ -66,10 +66,10 @@ const MemberPage = () => {
 
         if (response.status === 200) {
           setMemberData(response.data.results);
+          setIsLoading(false);
         }
       };
       fetchMembers();
-      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -89,6 +89,8 @@ const MemberPage = () => {
   const clearAllFilters = () => {
     setActiveFilters({});
   };
+
+  console.log(memberData);
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
@@ -179,7 +181,10 @@ const MemberPage = () => {
       {isLoading ? (
         <div className="w-full flex justify-center py-10">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mb-4" />
+            <div className="relative h-12 w-12 mb-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 absolute top-0 left-0" />
+              <Heart className="h-5 w-5 text-pink-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+            </div>
             <p className="text-pink-500 text-sm font-medium">
               Loading members...
             </p>
@@ -189,6 +194,7 @@ const MemberPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {memberData.map((member, idx) => (
             <MemberCard
+              id={member.id}
               key={idx}
               name={`${member.first_name} ${member.last_name}`}
               location={`${member.city_name}, ${member.country_name}`}
