@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import OnboardingSliderWrapper from "./OnboardingSliderWrapper";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Heart} from "lucide-react";
 
 interface Heart {
   id: number;
@@ -38,10 +38,13 @@ const OnboardingPage = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-indigo-600 mx-auto" />
-          <p className="mt-4 text-lg font-medium text-gray-700">Loading...</p>
+      <div className="w-full flex justify-center py-10">
+        <div className="flex flex-col items-center">
+          <div className="relative h-12 w-12 mb-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 absolute top-0 left-0" />
+            <Heart className="h-5 w-5 text-pink-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+          </div>
+          <p className="text-pink-500 text-sm font-medium">Loading ...</p>
         </div>
       </div>
     );

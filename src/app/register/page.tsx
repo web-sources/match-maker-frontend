@@ -93,6 +93,7 @@ const RegisterPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-0 shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-rose-500 to-pink-500 h-2 w-full"></div>
+
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Heart className="w-10 h-10 text-rose-500 fill-rose-500" />
@@ -104,6 +105,7 @@ const RegisterPage = () => {
             Join our community and start your love story today
           </p>
         </CardHeader>
+
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

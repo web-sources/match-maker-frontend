@@ -7,6 +7,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 interface MemberCardProps {
+  id : string;
   name: string;
   location: string;
   profilePhoto: string;
@@ -16,6 +17,7 @@ interface MemberCardProps {
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
+  id,
   name,
   location,
   profilePhoto,
@@ -27,7 +29,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const router = useRouter();
 
   const handleCardClick = () => {
-    router.push(`/members/${1}`);
+    router.push(`/members/${id}`);
   };
 
   return (
@@ -120,3 +122,4 @@ const MemberCard: React.FC<MemberCardProps> = ({
 };
 
 export default MemberCard;
+

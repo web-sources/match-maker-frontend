@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, Heart, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Heart, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -99,6 +99,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-0 shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-rose-500 to-pink-500 h-2 w-full"></div>
+
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Heart className="w-10 h-10 text-rose-500 fill-rose-500" />
@@ -110,6 +111,7 @@ export default function LoginPage() {
             Continue your journey to find love
           </p>
         </CardHeader>
+
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -173,8 +175,17 @@ export default function LoginPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logging in...
+                      <div className="w-full flex justify-center py-10">
+                        <div className="flex flex-col items-center">
+                          <div className="relative h-12 w-12 mb-4">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 absolute top-0 left-0" />
+                            <Heart className="h-5 w-5 text-pink-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                          </div>
+                          <p className="text-pink-500 text-sm font-medium">
+                            Logging in...
+                          </p>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <>
