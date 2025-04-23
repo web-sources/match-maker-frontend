@@ -8,13 +8,14 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 // Step 7: Review and Submit (with Terms and Conditions)
-const Step7ReviewSubmit = () => {
+const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
+  console.log(isEditing, "isEditing");
   const { resetData, data } = useOnboardingStore();
   const { accessToken, login } = useAuth();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
 
-  console.log(data)
+  console.log(data);
 
   const handleSubmit = async () => {
     try {

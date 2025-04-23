@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import clsx from "clsx";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const schema = z.object({
   date_of_birth: z.string().nonempty("Date of birth is required"),
@@ -19,12 +20,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const Step1BasicInfo = () => {
+const Step1BasicInfo = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -39,9 +41,22 @@ const Step1BasicInfo = () => {
     },
   });
 
+  useEffect(() => {
+    if (isEditing && data) {
+      reset({
+        date_of_birth: data.date_of_birth || "",
+        gender: data.gender || "",
+        sexual_orientation: data.sexual_orientation || "",
+        education_level: data.education_level || "",
+        occupation: data.occupation || "",
+        height_cm: data.height || 0,
+        body_type: data.body_type || "",
+      });
+    }
+  }, [isEditing, data, reset]);
+
   const onSubmit = (values: FormData) => {
     updateData(values);
-    console.log(values, "values from step 1");
     document
       .querySelector(".swiper-button-next")
       ?.dispatchEvent(new Event("click"));
@@ -57,9 +72,13 @@ const Step1BasicInfo = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="text-center">
-          <p className="text-xs text-gray-400">Step 1 of 6</p>
+          <p className="text-xs text-gray-400">
+            {isEditing ? "Edit Profile" : "Step 1 of 4"}
+          </p>
           <h2 className="text-2xl font-bold text-gray-800 mt-1">
-            Basic Information + Physical Details
+            {isEditing
+              ? "Basic Information"
+              : "Basic Information + Physical Details"}
           </h2>
         </div>
 

@@ -41,10 +41,12 @@ const ForgotPasswordModal = ({
     },
   });
 
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   const onSubmit = async (values: { email: string }) => {
     try {
       const response = await axios.post(
-        `localhost:3000/api/v1/startup/auth/password-reset/`,
+        `${BASE_URL}/api/v1/startup/auth/password-reset/`,
         values,
         {
           headers: {
@@ -85,9 +87,9 @@ const ForgotPasswordModal = ({
                 <FormItem>
                   <FormLabel className="text-gray-700">Email Address</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="your@email.com" 
-                      {...field} 
+                    <Input
+                      placeholder="your@email.com"
+                      {...field}
                       className="focus:ring-2 focus:ring-rose-300"
                     />
                   </FormControl>
@@ -95,8 +97,8 @@ const ForgotPasswordModal = ({
                 </FormItem>
               )}
             />
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg"
             >
               Send Reset Link

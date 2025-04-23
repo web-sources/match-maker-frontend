@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import * as z from "zod";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const schema = z.object({
   relationship_goal: z.string().nonempty("Please select a goal"),
@@ -123,7 +123,7 @@ const LANGUAGES = [
   "other",
 ];
 
-const Step3Preferences = () => {
+const Step3Preferences = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
   const [search, setSearch] = useState("");
 
@@ -131,6 +131,7 @@ const Step3Preferences = () => {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -143,6 +144,20 @@ const Step3Preferences = () => {
         : [],
     },
   });
+
+  useEffect(() => {
+    if (isEditing && data) {
+      reset({
+        relationship_goal: data.relationship_goal || "",
+        smoking: typeof data.smoking === "boolean" ? data.smoking : undefined,
+        drinking:
+          typeof data.drinking === "boolean" ? data.drinking : undefined,
+        languages_spoken: data.languages
+          ? data.languages.split(",").map((l) => l.trim())
+          : [],
+      });
+    }
+  }, [isEditing, data, reset]);
 
   const onSubmit = (values: FormData) => {
     const { languages_spoken, ...rest } = values;
@@ -174,7 +189,9 @@ const Step3Preferences = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="space-y-1 text-center">
-          <p className="text-xs text-gray-400">Step 3 of 6</p>
+          <p className="text-xs text-gray-400">
+            {isEditing ? "Edit Profile" : "Step 2 of 4"}
+          </p>
           <h2 className="text-2xl font-bold text-gray-800">
             Preferences + Languages You Speak
           </h2>
