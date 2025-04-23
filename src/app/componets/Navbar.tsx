@@ -1,13 +1,16 @@
 "use client";
 
 import {
-  Heart,
   MessageSquare,
   Users,
   Home,
   BookOpen,
   Star,
   Menu,
+  User,
+  Settings,
+  LogOut,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,12 +19,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
+import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 
 export function Navbar() {
   const { accessToken, logout, isprofile_complete } = useAuth();
@@ -73,69 +78,97 @@ export function Navbar() {
             />
           </div>
 
-          {/* Right side */}
           <div className="flex items-center space-x-4">
             {accessToken ? (
               isprofile_complete ? (
-                // ✅ Profile is complete — show normal logged-in UI
                 <div className="flex items-center space-x-4">
-                  <button className="relative p-1 text-gray-600 hover:text-rose-500 transition-colors">
-                    <MessageSquare className="h-6 w-6" />
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-xs text-white flex items-center justify-center">
+                  {/* Notification Badge with Message Icon */}
+                  <button
+                    className="relative p-2 rounded-full hover:bg-pink-50 transition-colors"
+                    onClick={() => router.push("/messages")}
+                  >
+                    <MessageSquare className="h-5 w-5 text-gray-600 hover:text-pink-500" />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center border-2 border-white">
                       3
                     </span>
                   </button>
+
+                  {/* Profile Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Avatar className="h-8 w-8 cursor-pointer border-2 border-rose-500 transition-transform hover:scale-105">
-                        <AvatarImage src="https://randomuser.me/api/portraits/women/44.jpg" />
-                        <AvatarFallback>U</AvatarFallback>
-                      </Avatar>
+                      <button className="focus:outline-none">
+                        <Avatar className="h-9 w-9 cursor-pointer border-2 border-pink-200 hover:border-pink-300 transition-all hover:scale-105">
+                          <AvatarImage src={"/default-avatar.jpg"} />
+                          <AvatarFallback className="bg-pink-100 text-pink-600">
+                            {"U"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => router.push("/profile")}>
-                        Profile
-                      </DropdownMenuItem>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 rounded-xl shadow-lg border border-gray-100 p-2"
+                    >
+                      <DropdownMenuLabel className="px-4 py-2 font-medium text-gray-900 flex items-center">
+                        <User className="h-4 w-4 mr-2 text-pink-500" />
+                        My Account
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-100" />
+
                       <DropdownMenuItem
+                        className="px-4 py-2 rounded-lg hover:bg-pink-50 cursor-pointer focus:bg-pink-50"
+                        onClick={() => router.push("/profile")}
+                      >
+                        <User className="h-4 w-4 mr-2 text-gray-600" />
+                        View Profile
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="px-4 py-2 rounded-lg hover:bg-pink-50 cursor-pointer focus:bg-pink-50"
                         onClick={() => router.push("/settings")}
                       >
+                        <Settings className="h-4 w-4 mr-2 text-gray-600" />
                         Settings
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={logout}>
+
+                      <DropdownMenuSeparator className="bg-gray-100" />
+
+                      <DropdownMenuItem
+                        className="px-4 py-2 rounded-lg hover:bg-pink-50 cursor-pointer focus:bg-pink-50 text-red-500"
+                        onClick={logout}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
                         Logout
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               ) : (
-                // ❗ Profile incomplete — show Complete Profile button
                 <Button
                   onClick={() => router.push("/onboarding")}
-                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                  className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white shadow-md"
                 >
                   Complete Profile
                 </Button>
               )
             ) : (
-              // ❌ Not logged in — show login/signup
               <>
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="hidden sm:inline-flex cursor cursor-pointer"
+                    className="hidden sm:inline-flex text-gray-600 hover:text-pink-500"
                   >
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-md  cursor cursor-pointer">
+                  <Button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md">
                     Sign Up
                   </Button>
                 </Link>
               </>
             )}
 
-            {/* Mobile menu */}
             <Sheet>
               <SheetTrigger asChild>
                 <button className="md:hidden text-gray-500 hover:text-gray-700 transition-colors">

@@ -58,7 +58,7 @@ export default function LoginPage() {
         router.push("/");
       }
     }
-  }, [accessToken, router]);
+  }, [accessToken, router, isprofile_complete]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {

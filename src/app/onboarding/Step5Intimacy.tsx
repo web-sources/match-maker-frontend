@@ -5,6 +5,7 @@ import { useOnboardingStore } from "@/stores/useOnboardingStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import * as z from "zod";
+import { useEffect } from "react";
 
 // Validation schema
 const schema = z.object({
@@ -19,12 +20,13 @@ type FormData = z.infer<typeof schema>;
 
 const LOVE_LANGUAGES = ["words", "touch", "gifts", "time", "acts"];
 
-const Step5Intimacy = () => {
+const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -36,6 +38,18 @@ const Step5Intimacy = () => {
       love_language: data.love_language || "",
     },
   });
+
+  useEffect(() => {
+    if (isEditing && data) {
+      reset({
+        turn_ons: data.turn_ons || "",
+        turn_offs: data.turn_offs || "",
+        kinks: data.kinks || "",
+        ideal_first_date: data.ideal_first_date || "",
+        love_language: data.love_language || "",
+      });
+    }
+  }, [isEditing, data, reset]);
 
   const onSubmit = (values: FormData) => {
     updateData(values);
@@ -55,7 +69,9 @@ const Step5Intimacy = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="space-y-1">
-          <p className="text-xs text-gray-400 text-center">Step 5 of 6</p>
+          <p className="text-xs text-gray-400 text-center">
+            {isEditing ? "Edit Profile" : "Step 3 of 4"}
+          </p>
           <h2 className="text-xl font-bold text-center text-gray-800">
             Intimacy Preferences
           </h2>
