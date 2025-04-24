@@ -15,44 +15,74 @@ const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
 
-  console.log(data);
-
   const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/api/v1/startup/fun/profile/`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
+    if (isEditing) {
+      try {
+        const response = await axios.put(
+          `${BASE_URL}/api/v1/startup/fun/profile/`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+
+        console.log(response, "response from api");
+
+        if (response.status === 200) {
+          toast.success(response.data.data || "Profile Updated Succesfully!");
+          router.push("/settings");
         }
-      );
-
-      console.log(response, "response from api");
-
-      if (response.status === 201) {
-        toast.success(response.data.data || "Profile Created Succesfully!");
-        login(
-          accessToken,
-          false,
-          response.data.is_profile_created,
-          false,
-          true
-        );
-        router.push("/");
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error(
+            error.response?.data?.error || "Profile Failed ! Try Aftersometime"
+          );
+        } else {
+          console.log(error);
+        }
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.error || "Profile Failed ! Try Aftersometime"
+    } else {
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/api/v1/startup/fun/profile/`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
         );
-      } else {
-        console.log(error);
+
+        console.log(response, "response from api");
+
+        if (response.status === 201) {
+          toast.success(response.data.data || "Profile Created Succesfully!");
+          login(
+            accessToken,
+            false,
+            response.data.is_profile_created,
+            false,
+            true
+          );
+          router.push("/");
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error(
+            error.response?.data?.error || "Profile Failed ! Try Aftersometime"
+          );
+        } else {
+          console.log(error);
+        }
       }
     }
+
     resetData();
   };
 

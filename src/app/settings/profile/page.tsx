@@ -5,12 +5,13 @@ import { useOnboardingStore } from "@/stores/useOnboardingStore";
 import ProfileSliderWrapper from "./ProfileSliderWrapper";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function ProfileSettings() {
   const { accessToken, loading } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const { updateData, resetData } = useOnboardingStore();
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -22,6 +23,7 @@ export default function ProfileSettings() {
   }, [accessToken, loading, router]);
   useEffect(() => {
     const fetchProfileData = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(
           `${BASE_URL}/api/v1/startup/fun/profile/`,
@@ -32,7 +34,6 @@ export default function ProfileSettings() {
             },
           }
         );
-        
 
         if (response.status === 200) {
           // Map API response to store format
@@ -54,6 +55,8 @@ export default function ProfileSettings() {
             ideal_first_date: response.data.ideal_first_date,
             love_language: response.data.love_language,
           });
+
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
@@ -67,7 +70,7 @@ export default function ProfileSettings() {
     return () => resetData();
   }, [accessToken, updateData, resetData, BASE_URL]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full flex justify-center py-10">
         <div className="flex flex-col items-center">

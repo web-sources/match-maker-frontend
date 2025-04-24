@@ -82,12 +82,11 @@ export function Navbar() {
             {accessToken ? (
               isprofile_complete ? (
                 <div className="flex items-center space-x-4">
-                  {/* Notification Badge with Message Icon */}
                   <button
                     className="relative p-2 rounded-full hover:bg-pink-50 transition-colors"
                     onClick={() => router.push("/messages")}
                   >
-                    <MessageSquare className="h-5 w-5 text-gray-600 hover:text-pink-500" />
+                    <MessageSquare className="h-5 w-5 text-gray-600 hover:text-pink-500 cursor cursor-pointer" />
                     <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center border-2 border-white">
                       3
                     </span>
