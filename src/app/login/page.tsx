@@ -99,6 +99,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-0 shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-rose-500 to-pink-500 h-2 w-full"></div>
+    
 
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
