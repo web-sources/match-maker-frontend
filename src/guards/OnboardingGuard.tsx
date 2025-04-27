@@ -14,12 +14,10 @@ export const OnboardingGuard = ({
   const { accessToken, loading, isprofile_complete } = useAuth();
   const router = useRouter();
 
-  console.log(isprofile_complete);
-
   useEffect(() => {
     if (!loading) {
       if (!accessToken) {
-        router.replace("/login");
+        router.replace("/");
       } else if (!isprofile_complete) {
         router.replace("/onboarding");
       }
@@ -38,10 +36,6 @@ export const OnboardingGuard = ({
         </div>
       </div>
     );
-  }
-
-  if (!accessToken || !isprofile_complete) {
-    return null;
   }
 
   return <>{children}</>;

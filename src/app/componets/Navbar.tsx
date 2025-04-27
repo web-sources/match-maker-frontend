@@ -42,7 +42,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 border-b border-white/20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -56,23 +56,23 @@ export function Navbar() {
           {/* Center nav items */}
           <div className="hidden md:flex items-center space-x-8">
             <NavItem
-              icon={<Home className="h-5 w-5" />}
+              icon={<Home className="h-5 w-5 text-white" />}
               text="Home"
               href="/"
               active
             />
             <NavItem
-              icon={<Users className="h-5 w-5" />}
+              icon={<Users className="h-5 w-5 text-white" />}
               text="Members"
               href="/member"
             />
             <NavItem
-              icon={<BookOpen className="h-5 w-5" />}
+              icon={<BookOpen className="h-5 w-5 text-white" />}
               text="Stories"
               href="/stories"
             />
             <NavItem
-              icon={<Star className="h-5 w-5" />}
+              icon={<Star className="h-5 w-5 text-white" />}
               text="Reviews"
               href="/reivew"
             />
@@ -155,13 +155,13 @@ export function Navbar() {
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="hidden sm:inline-flex text-gray-600 hover:text-pink-500"
+                    className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md cursor cursor-pointer"
                   >
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md">
+                  <Button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md cursor cursor-pointer">
                     Sign Up
                   </Button>
                 </Link>
@@ -207,7 +207,7 @@ function NavItem({
     <a
       href={href}
       className={`relative group flex items-center px-1 pt-1 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
-        active ? "text-rose-600" : "text-gray-700"
+        active ? "text-rose-600" : "text-white"
       }`}
     >
       <span className="mr-2">{icon}</span>

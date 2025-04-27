@@ -14,12 +14,11 @@ function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <Toaster position="top-right" />
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 relative overflow-hidden">
         {!shouldHide && <Navbar />}
-        <main className={`flex-grow ${!shouldHide ? "pt-0" : "pt-0"}`}>
+        <main>
           {children}
         </main>
-
         {!shouldHide && <Footer />}
       </div>
     </AuthProvider>

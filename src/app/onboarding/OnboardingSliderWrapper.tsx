@@ -9,10 +9,12 @@ import Step1BasicInfo from "./Step1BasicInfo";
 import Step3Preferences from "./Step3Preferences";
 import Step5Intimacy from "./Step5Intimacy";
 import Step7ReviewSubmit from "./Step7ReviewSubmit";
+import Step2PhysicalInfo from "./Step2PhysicalInfo";
+import Step4Languages from "./Step4Languages";
 
 const OnboardingSliderWrapper = () => {
   return (
-    <div className="relative w-full max-w-xl mx-auto min-h-screen overflow-hidden bg-gradient-to-b from-pink-50 via-white to-blue-50">
+    <div className="relative w-full max-w-xl mx-auto min-h-screen overflow-hidden">
       {/* Main content with higher z-index */}
       <div className="relative z-10">
         <Swiper
@@ -27,7 +29,13 @@ const OnboardingSliderWrapper = () => {
             <Step1BasicInfo />
           </SwiperSlide>
           <SwiperSlide>
+            <Step2PhysicalInfo />
+          </SwiperSlide>
+          <SwiperSlide>
             <Step3Preferences />
+          </SwiperSlide>
+          <SwiperSlide>
+            <Step4Languages />
           </SwiperSlide>
           <SwiperSlide>
             <Step5Intimacy />

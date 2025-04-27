@@ -29,7 +29,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
@@ -116,13 +116,19 @@ type userProfile = {
 const MemberDetailsPage = () => {
   const [profile, setProfile] = useState<userProfile | null>(null);
   const { accessToken } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [loadingprofile, setLoadingprofile] = useState(true);
   const [age, setAge] = useState<number | null>(null);
-
+  const router = useRouter();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const params = useParams();
   const memberId = params.id;
+
+  useEffect(() => {
+    if (!accessToken) {
+      router.push("/login");
+    }
+  }, [accessToken]);
 
   const calculateAge = (birthDateString: string) => {
     const birthDate = new Date(birthDateString);
@@ -144,7 +150,7 @@ const MemberDetailsPage = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        setLoading(true);
+        setLoadingprofile(true);
 
         const response = await axios.get(
           `${BASE_URL}/api/v1/startup/fun/profile/${memberId}`,
@@ -167,7 +173,7 @@ const MemberDetailsPage = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false);
+        setLoadingprofile(false);
       }
     };
     if (memberId) {
@@ -175,7 +181,7 @@ const MemberDetailsPage = () => {
     }
   }, [memberId, BASE_URL, accessToken]);
 
-  if (loading) {
+  if (loadingprofile) {
     return (
       <div className="w-full flex justify-center py-10">
         <div className="flex flex-col items-center">
@@ -191,14 +197,8 @@ const MemberDetailsPage = () => {
     );
   }
 
-  if (!profile) {
-    return (
-      <div className="container mx-auto p-4 text-center">Profile not found</div>
-    );
-  }
-
   // Format the languages spoken into an array
-  const languagesArray = profile.languages_spoken
+  const languagesArray = profile?.languages_spoken
     ? profile.languages_spoken.split(",").map((lang) => lang.trim())
     : [];
 
@@ -221,8 +221,8 @@ const MemberDetailsPage = () => {
           <Card className="sticky top-6 overflow-hidden shadow-lg border-0">
             <div className="relative aspect-square w-full">
               <Image
-                src={profile.profile_picture || "/member/member.jpg"}
-                alt={`${profile.user.first_name}'s profile`}
+                src={profile?.profile_picture || "/member/member.jpg"}
+                alt={`${profile?.user.first_name}'s profile`}
                 fill
                 className="object-cover"
                 priority
@@ -232,12 +232,12 @@ const MemberDetailsPage = () => {
                   <div>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        profile.user.is_online
+                        profile?.user.is_online
                           ? "bg-green-100 text-green-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {profile.user.is_online ? "Online" : "Offline"}
+                      {profile?.user.is_online ? "Online" : "Offline"}
                     </span>
                   </div>
                   <Button
@@ -256,13 +256,13 @@ const MemberDetailsPage = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {profile.user.first_name.toUpperCase()}{" "}
-                    {profile.user.last_name.toUpperCase()}
+                    {profile?.user.first_name.toUpperCase()}{" "}
+                    {profile?.user.last_name.toUpperCase()}
                   </h1>
                   <div className="flex items-center text-gray-500 mt-1">
                     <MapPin className="h-4 w-4 mr-1" />
                     <span>
-                      {profile.user.city_name}, {profile.user.country_name}
+                      {profile?.user.city_name}, {profile?.user.country_name}
                     </span>
                   </div>
                 </div>
@@ -300,7 +300,7 @@ const MemberDetailsPage = () => {
                   <Ruler className="h-4 w-4 text-pink-500 mr-2" />
                   <div>
                     <p className="text-xs text-gray-500">Height</p>
-                    <p className="font-medium">{profile.height_cm} cm</p>
+                    <p className="font-medium">{profile?.height_cm} cm</p>
                   </div>
                 </div>
                 <div className="flex items-center">
@@ -308,7 +308,7 @@ const MemberDetailsPage = () => {
                   <div>
                     <p className="text-xs text-gray-500">Body Type</p>
                     <p className="font-medium capitalize">
-                      {profile.body_type}
+                      {profile?.body_type}
                     </p>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ const MemberDetailsPage = () => {
                   <div>
                     <p className="text-xs text-gray-500">Orientation</p>
                     <p className="font-medium capitalize">
-                      {profile.sexual_orientation}
+                      {profile?.sexual_orientation}
                     </p>
                   </div>
                 </div>
@@ -349,7 +349,7 @@ const MemberDetailsPage = () => {
                 <span className="bg-pink-500 text-white p-2 rounded-lg mr-3">
                   <User className="h-5 w-5" />
                 </span>
-                About {profile.user.first_name}
+                About {profile?.user.first_name}
               </h2>
             </CardHeader>
             <CardContent className="p-6">
@@ -364,7 +364,7 @@ const MemberDetailsPage = () => {
                   </div>
                   <div className="flex flex-wrap gap-3">
                     <span className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium shadow-sm capitalize">
-                      {profile.relationship_goal}
+                      {profile?.relationship_goal}
                     </span>
                   </div>
                 </div>
@@ -376,8 +376,8 @@ const MemberDetailsPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Bio</h3>
                   </div>
                   <p className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-lg">
-                    {profile.ideal_first_date ||
-                      `${profile.user.first_name} hasn't written a bio yet.`}
+                    {profile?.ideal_first_date ||
+                      `${profile?.user.first_name} hasn't written a bio yet.`}
                   </p>
                 </div>
 
@@ -396,7 +396,7 @@ const MemberDetailsPage = () => {
                           Occupation
                         </p>
                         <p className="font-medium text-gray-800 capitalize mt-1">
-                          {profile.occupation || "Not specified"}
+                          {profile?.occupation || "Not specified"}
                         </p>
                       </div>
                       <div className="bg-gray-50 p-3 rounded-lg">
@@ -404,7 +404,7 @@ const MemberDetailsPage = () => {
                           Education
                         </p>
                         <p className="font-medium text-gray-800 capitalize mt-1">
-                          {profile.education_level || "Not specified"}
+                          {profile?.education_level || "Not specified"}
                         </p>
                       </div>
                     </div>
@@ -454,10 +454,10 @@ const MemberDetailsPage = () => {
                         </span>
                         <span
                           className={`font-medium ${
-                            profile.smoking ? "text-rose-500" : "text-green-500"
+                            profile?.smoking ? "text-rose-500" : "text-green-500"
                           }`}
                         >
-                          {profile.smoking ? "Yes" : "No"}
+                          {profile?.smoking ? "Yes" : "No"}
                         </span>
                       </div>
                       <div className="flex justify-between items-center py-3">
@@ -467,12 +467,12 @@ const MemberDetailsPage = () => {
                         </span>
                         <span
                           className={`font-medium ${
-                            profile.drinking
+                            profile?.drinking
                               ? "text-rose-500"
                               : "text-green-500"
                           }`}
                         >
-                          {profile.drinking ? "Yes" : "No"}
+                          {profile?.drinking ? "Yes" : "No"}
                         </span>
                       </div>
                     </div>
@@ -488,7 +488,7 @@ const MemberDetailsPage = () => {
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <span className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-100 to-rose-100 text-pink-800 text-sm font-medium shadow-sm capitalize">
-                        {profile.love_language || "Not specified"}
+                        {profile?.love_language || "Not specified"}
                       </span>
                     </div>
                   </div>
@@ -517,7 +517,7 @@ const MemberDetailsPage = () => {
                   </h3>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-gray-700">
-                      {profile.turn_ons || "Not specified"}
+                      {profile?.turn_ons || "Not specified"}
                     </p>
                   </div>
                 </div>
@@ -530,7 +530,7 @@ const MemberDetailsPage = () => {
                   </h3>
                   <div className="bg-rose-50 p-4 rounded-lg">
                     <p className="text-gray-700">
-                      {profile.turn_offs || "Not specified"}
+                      {profile?.turn_offs || "Not specified"}
                     </p>
                   </div>
                 </div>
@@ -543,7 +543,7 @@ const MemberDetailsPage = () => {
                   </h3>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-gray-700">
-                      {profile.kinks || "Not specified"}
+                      {profile?.kinks || "Not specified"}
                     </p>
                   </div>
                 </div>

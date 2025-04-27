@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import * as z from "zod";
 import clsx from "clsx";
+import { useEffect } from "react";
 
 const schema = z.object({
   height: z.number().min(1, "Height is required"),
@@ -14,11 +15,12 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const Step2PhysicalInfo = () => {
+const Step2PhysicalInfo = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
 
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
@@ -36,33 +38,42 @@ const Step2PhysicalInfo = () => {
       ?.dispatchEvent(new Event("click"));
   };
 
+  useEffect(() => {
+    if (isEditing && data) {
+      reset({
+        height: data.height || 0,
+        body_type: data.body_type || "",
+      });
+    }
+  }, [isEditing, data, reset]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4">
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-6 bg-white shadow-xl rounded-3xl p-8"
+        className="w-full max-w-md space-y-6 rounded-3xl p-8 bg-white/10 backdrop-blur-md border border-white/20 z-20 shadow-2xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         {/* Step Heading */}
         <div className="space-y-1">
-          <p className="text-xs text-gray-400 text-center">Step 2 of 6</p>
-          <h2 className="text-xl font-bold text-center text-gray-800">
+          <p className="text-xs text-white text-center">Step 2 of 6</p>
+          <h2 className="text-xl font-bold text-center text-white">
             Physical Details
           </h2>
         </div>
 
         {/* Height */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-white mb-1">
             Height (in cm)
           </label>
           <input
             type="number"
             {...register("height", { valueAsNumber: true })}
             className={clsx(
-              "w-full p-3 rounded-xl border text-sm",
+              "w-full p-3 rounded-xl border text-sm text-white cursor cursor-pointer",
               errors.height ? "border-red-500" : "border-gray-300"
             )}
           />
@@ -73,21 +84,29 @@ const Step2PhysicalInfo = () => {
 
         {/* Body Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-white mb-1">
             Body Type
           </label>
           <select
             {...register("body_type")}
             className={clsx(
-              "w-full p-3 rounded-xl border text-sm bg-white",
+              "w-full p-3 rounded-xl border text-sm text-white cursor cursor-pointer",
               errors.body_type ? "border-red-500" : "border-gray-300"
             )}
           >
-            <option value="">Select</option>
-            <option value="slim">Slim</option>
-            <option value="average">Average</option>
-            <option value="athletic">Athletic</option>
-            <option value="curvy">Curvy</option>
+            <option value="" className="text-gray-500">Select</option>
+            <option value="slim" className="text-gray-500">
+              Slim
+            </option>
+            <option value="average" className="text-gray-500">
+              Average
+            </option>
+            <option value="athletic" className="text-gray-500">
+              Athletic
+            </option>
+            <option value="curvy" className="text-gray-500">
+              Curvy
+            </option>
           </select>
           {errors.body_type && (
             <p className="text-sm text-red-500 mt-1">
@@ -100,7 +119,7 @@ const Step2PhysicalInfo = () => {
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition"
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition cursor-pointer"
           >
             Continue →
           </button>
