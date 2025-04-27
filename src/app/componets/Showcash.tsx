@@ -1,53 +1,121 @@
 "use client";
 
-import {} from "lucide-react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+
+const slides = [
+  {
+    image: "/bg-overlay/bg-ol-12.jpg",
+    title: "Find Your Perfect Match",
+    description:
+      "Join thousands of happy couples who found love through our app. It's time to write your own love story!",
+    buttonText: "Start Your Journey",
+  },
+  {
+    image: "/bg-overlay/bg-ol-11.jpg",
+    title: "Love Knows No Distance",
+    description:
+      "Whether near or far, love is just a heartbeat away. Discover meaningful connections today!",
+    buttonText: "Discover Connections",
+  },
+  {
+    image: "/bg-overlay/bg-ol-5.jpg",
+    title: "Your Happily Ever After Begins Here",
+    description:
+      "Every great story starts with a hello. Find someone special and write your next chapter.",
+    buttonText: "Begin Your Story",
+  },
+  {
+    image: "/bg-overlay/bg-ol-8.jpg",
+    title: "Spark Meaningful Connections",
+    description:
+      "True love starts with a simple conversation. Take the first step toward your beautiful journey today.",
+    buttonText: "Start Chatting",
+  },
+  {
+    image: "/bg-overlay/bg-ol-7.jpg",
+    title: "Love is Just a Click Away",
+    description:
+      "Find someone who makes your heart smile. Explore endless possibilities and real connections now.",
+    buttonText: "Find Your Match",
+  },
+];
 
 export function ShowcaseSection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 6000); // change every 6 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const { image, title, description, buttonText } = slides[currentSlide];
+
   return (
-    <section className="relative py-16 bg-gradient-to-b from-rose-50 to-white w-full -mt-16 pt-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left side - Image with emojis */}
-          <div className="relative">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src="/showcase/showcase.jpg"
-                alt="Happy woman using dating app"
-                width={500}
-                height={500}
-                className="w-full h-auto object-cover"
-              />
+    <section className="relative h-screen w-full overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide} // key both image and text on the slide index
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          className="absolute inset-0"
+        >
+          {/* Background Image */}
+          <Image
+            src={image}
+            alt="Romantic background"
+            fill
+            className="object-cover"
+            priority
+            quality={100}
+          />
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+        </motion.div>
+      </AnimatePresence>
 
-              {/* Floating emojis */}
-              <div className="absolute -top-6 -left-6 bg-white p-3 rounded-full shadow-lg text-2xl animate-bounce">
-                😍
+      {/* Centered Content */}
+      <div className="relative z-10 h-full flex items-center justify-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide} // again key based on slide index
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                {title}
+              </h1>
+
+              <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-md">
+                {description}
+              </p>
+
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white px-8 py-6 text-lg shadow-lg"
+                >
+                  {buttonText}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg backdrop-blur-sm"
+                >
+                  How It Works
+                </Button>
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white p-3 rounded-full shadow-lg text-2xl animate-bounce delay-100">
-                💑
-              </div>
-              <div className="absolute top-1/2 -right-8 bg-white p-3 rounded-full shadow-lg text-2xl animate-bounce delay-200">
-                ❤️
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Content with thoughts and slider */}
-          <div className="space-y-8">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-              Find Your Perfect Match
-            </h2>
-
-            <p className="text-lg text-gray-600">
-              Join thousands of happy couples who found love through our app.
-              It&apos;s time to write your own love story!
-            </p>
-
-            <Button className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white px-8 py-6 text-lg">
-              Start Your Journey Today
-            </Button>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

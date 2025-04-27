@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import * as z from "zod";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Validation schema
 const schema = z.object({
@@ -119,28 +119,41 @@ const LANGUAGES = [
   "other",
 ];
 
-const Step4Languages = () => {
+const Step4Languages = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
   const [search, setSearch] = useState("");
 
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      languages: data.languages ? data.languages.split(",").map(l => l.trim()) : [],
+      languages: data.languages
+        ? data.languages.split(",").map((l) => l.trim())
+        : [],
     },
   });
+
+  useEffect(() => {
+    if (isEditing && data) {
+      reset({
+        languages: data.languages
+          ? data.languages.split(",").map((l) => l.trim())
+          : [],
+      });
+    }
+  }, [isEditing, data, reset]);
 
   const onSubmit = (values: FormData) => {
     const payload = {
       ...values,
       languages: values.languages.join(", "),
     };
-  
+
     updateData(payload);
     document
       .querySelector(".swiper-button-next")
@@ -157,14 +170,14 @@ const Step4Languages = () => {
     <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4">
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-6 bg-white shadow-xl rounded-3xl p-8"
+        className="w-full max-w-md space-y-6 rounded-3xl p-8 bg-white/10 backdrop-blur-md border border-white/20 z-20 shadow-2xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="space-y-1">
-          <p className="text-xs text-gray-400 text-center">Step 4 of 6</p>
-          <h2 className="text-xl font-bold text-center text-gray-800">
+          <p className="text-xs text-white text-center">Step 4 of 6</p>
+          <h2 className="text-xl font-bold text-center text-white">
             Languages You Speak
           </h2>
         </div>
@@ -175,11 +188,11 @@ const Step4Languages = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search languages..."
-          className="w-full p-3 rounded-xl border border-gray-300 text-sm"
+          className="w-full p-3 rounded-xl border text-white border-gray-300 text-sm"
         />
 
         {/* Scrollable List */}
-        <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-72 overflow-y-auto pr-1 ">
           {filteredLanguages.length > 0 ? (
             filteredLanguages.map((lang) => (
               <label
@@ -188,20 +201,20 @@ const Step4Languages = () => {
                   "flex items-center gap-3 p-3 rounded-xl border cursor-pointer text-sm",
                   selected?.includes(lang)
                     ? "border-pink-500 bg-pink-50"
-                    : "border-gray-300 bg-white"
+                    : "border-gray-300 text-white"
                 )}
               >
                 <input
                   type="checkbox"
                   value={lang}
                   {...register("languages")}
-                  className="form-checkbox accent-pink-600"
+                  className="form-checkbox accent-pink-600 "
                 />
                 {lang}
               </label>
             ))
           ) : (
-            <p className="text-sm text-gray-500">No languages found</p>
+            <p className="text-sm text-white">No languages found</p>
           )}
         </div>
 
@@ -214,7 +227,7 @@ const Step4Languages = () => {
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition"
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition cursor-pointer"
           >
             Continue →
           </button>

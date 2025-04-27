@@ -7,7 +7,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 interface MemberCardProps {
-  id : string;
+  id: string;
   name: string;
   location: string;
   profilePhoto: string;
@@ -80,10 +80,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
 
         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full capitalize">
+          <span className="text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full capitalize">
             {relationship_goal?.toUpperCase()}
           </span>
-          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full capitalize">
+          <span className="text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full capitalize">
             {Array.isArray(languages_spoken)
               ? languages_spoken
                   .map((lang) => lang.trim().toUpperCase())
@@ -122,4 +122,3 @@ const MemberCard: React.FC<MemberCardProps> = ({
 };
 
 export default MemberCard;
-

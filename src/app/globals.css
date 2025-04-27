@@ -112,10 +112,13 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* .swiper-button-next,
+.swiper-button-next,
 .swiper-button-prev {
-  display: none !important;
-} */
+  color : white !important;
+  font-weight : bold !important;
+  position:absolute !important;
+  top:400 !important;
+}
 
 @layer base {
   * {
@@ -125,3 +128,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-float {
+  animation: float linear infinite;
+}
+

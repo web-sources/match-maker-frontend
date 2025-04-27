@@ -13,12 +13,10 @@ const schema = z.object({
   turn_offs: z.string().min(1, "Please list at least one turn-off"),
   kinks: z.string().min(1, "Please list at least one kink"),
   ideal_first_date: z.string().min(1, "Please provide your ideal first date"),
-  love_language: z.string().min(1, "Please select a love language"),
 });
 
 type FormData = z.infer<typeof schema>;
 
-const LOVE_LANGUAGES = ["words", "touch", "gifts", "time", "acts"];
 
 const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
   const { updateData, data } = useOnboardingStore();
@@ -35,7 +33,6 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
       turn_offs: data.turn_offs || "",
       kinks: data.kinks || "",
       ideal_first_date: data.ideal_first_date || "",
-      love_language: data.love_language || "",
     },
   });
 
@@ -46,7 +43,7 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
         turn_offs: data.turn_offs || "",
         kinks: data.kinks || "",
         ideal_first_date: data.ideal_first_date || "",
-        love_language: data.love_language || "",
+        
       });
     }
   }, [isEditing, data, reset]);
@@ -63,29 +60,29 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
     <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4">
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-6 bg-white shadow-xl rounded-3xl p-8"
+        className="w-full max-w-md space-y-6  rounded-3xl p-8 bg-white/10 backdrop-blur-md border border-white/20 z-20 shadow-2xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="space-y-1">
-          <p className="text-xs text-gray-400 text-center">
-            {isEditing ? "Edit Profile" : "Step 3 of 4"}
+          <p className="text-xs text-white text-center">
+            {isEditing ? "Edit Profile" : "Step 5 of 6"}
           </p>
-          <h2 className="text-xl font-bold text-center text-gray-800">
+          <h2 className="text-xl font-bold text-center text-white">
             Intimacy Preferences
           </h2>
         </div>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-white">
               Turn-Ons
             </label>
             <textarea
               {...register("turn_ons")}
               rows={3}
-              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholder="Describe your turn-ons"
             />
             {errors.turn_ons && (
@@ -96,13 +93,13 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-white">
               Turn-Offs
             </label>
             <textarea
               {...register("turn_offs")}
               rows={3}
-              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholder="Describe your turn-offs"
             />
             {errors.turn_offs && (
@@ -113,13 +110,13 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-white">
               Kinks
             </label>
             <textarea
               {...register("kinks")}
               rows={3}
-              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholder="Describe your kinks"
             />
             {errors.kinks && (
@@ -130,13 +127,13 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-white">
               Ideal First Date
             </label>
             <textarea
               {...register("ideal_first_date")}
               rows={3}
-              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               placeholder="What is your ideal first date?"
             />
             {errors.ideal_first_date && (
@@ -145,34 +142,12 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
               </p>
             )}
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Love Language
-            </label>
-            <select
-              {...register("love_language")}
-              className="mt-1 w-full border-2 border-gray-300 rounded-xl p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-            >
-              <option value="">Select your love language</option>
-              {LOVE_LANGUAGES.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang}
-                </option>
-              ))}
-            </select>
-            {errors.love_language && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.love_language.message}
-              </p>
-            )}
-          </div>
         </div>
 
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition"
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-xl transition cursor cursor-pointer"
           >
             Continue →
           </button>
