@@ -11,7 +11,7 @@ import Step7ReviewSubmit from "@/app/onboarding/Step7ReviewSubmit";
 
 const ProfileSliderWrapper = () => {
   return (
-    <div className="relative w-full max-w-xl mx-auto min-h-screen overflow-hidden">
+    <div className="relative w-full max-w-xl mx-auto min-h-screen overflow-hidden mt-10">
       <Swiper
         navigation
         allowTouchMove={false}

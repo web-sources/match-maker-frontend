@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { HeartsBackground } from "@/app/componets/HeartsBackground";
+import Image from "next/image";
 
 export default function ProfileSettings() {
   const { accessToken, loading } = useAuth();
@@ -87,6 +89,23 @@ export default function ProfileSettings() {
 
   return (
     <div className="relative w-full min-h-screen overflow-hidden bg-gradient-to-b from-pink-50 via-white to-blue-50">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/bg-overlay/bg-ol-11.jpg"
+          alt="Happy couple background"
+          fill
+          className="object-cover"
+          priority
+          quality={100}
+        />
+        <div className="absolute inset-0 bg-black/5" />
+      </div>
+
+      <HeartsBackground
+        color="text-rose-300"
+        className="pointer-events-none z-10"
+      />
+
       <div className="relative z-10">
         <ProfileSliderWrapper />
       </div>
