@@ -8,14 +8,12 @@ import MemberCards from "./componets/MemberCards";
 
 export default function Home() {
   return (
-    <OnboardingGuard> 
-      <div className="relative min-h-screen bg-black">
-        <main className="pt-16">
-          <ShowcaseSection />
-          <MemberCards />
-          <UIShowcaseSlider />
-          <HowItWorksSection />
-        </main>
+    <OnboardingGuard>
+      <div>
+        <ShowcaseSection  />
+        <MemberCards  />
+        <UIShowcaseSlider />
+        <HowItWorksSection />
       </div>
     </OnboardingGuard>
   );

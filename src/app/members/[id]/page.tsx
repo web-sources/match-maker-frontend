@@ -183,7 +183,7 @@ const MemberDetailsPage = () => {
 
   if (loadingprofile) {
     return (
-      <div className="w-full flex justify-center py-10">
+      <div className="w-full flex justify-center py-10 mt-10">
         <div className="flex flex-col items-center">
           <div className="relative h-12 w-12 mb-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 absolute top-0 left-0" />
@@ -203,7 +203,7 @@ const MemberDetailsPage = () => {
     : [];
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8 min-h-screen bg-gradient-to-br  to-white">
+    <div className="container max-w-7xl mx-auto px-4 py-8 min-h-screen bg-gradient-to-br  to-white mt-10">
       {/* Header with back button */}
       <div className="mb-6">
         <Link

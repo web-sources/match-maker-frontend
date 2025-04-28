@@ -4,8 +4,8 @@ import {
   MessageSquare,
   Users,
   Home,
-  BookOpen,
-  Star,
+  //BookOpen,
+  //Star,
   Menu,
   User,
   Settings,
@@ -28,54 +28,134 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 
-export function Navbar() {
+export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
   const { accessToken, logout, isprofile_complete } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [isDarkBackground, setIsDarkBackground] = useState(true);
+  const pathname = usePathname();
+
+  const pathParts = pathname.split("/");
+  const memberId = pathParts.length > 2 ? pathParts[2] : null;
 
   useEffect(() => {
     setMounted(true);
+
+    const handleScroll = () => {
+      const threshold = window.innerHeight * 0.8;
+      setIsDarkBackground(window.scrollY < threshold);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   if (!mounted) {
-    return null; // Return nothing until mounted
+    return null;
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 border-b border-white/20 shadow-lg">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors duration-300 ${
+        changeRoute === "/member" ||
+        changeRoute === "/settings" ||
+        changeRoute === "/settings/changepassword" ||
+        changeRoute === `/members/${memberId}` ||
+        changeRoute === "/messages"
+          ? "bg-white"
+          : isDarkBackground
+          ? "bg-white/5 border-white/20" // Scrolling logic
+          : "bg-white" // Normal scrolled behavior
+      }`}
+    >
+      {" "}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+          <Link href="/" className="flex-shrink-0 flex items-center">
             <Heart className="h-8 w-8 text-rose-500 fill-rose-500 drop-shadow-md animate-pulse" />
             <span className="ml-2 text-xl font-bold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm tracking-wide">
               Matchmaker
             </span>
-          </div>
+          </Link>
 
           {/* Center nav items */}
           <div className="hidden md:flex items-center space-x-8">
             <NavItem
-              icon={<Home className="h-5 w-5 text-white" />}
+              icon={
+                <Home
+                  className={`h-5 w-5 ${
+                    changeRoute === "/member" ||
+                    changeRoute === "/settings" ||
+                    changeRoute === "/settings/changepassword" ||
+                    changeRoute === `/members/${memberId}` ||
+                    changeRoute === "/messages"
+                      ? "text-rose-600"
+                      : isDarkBackground
+                      ? "text-white"
+                      : "text-rose-600"
+                  }`}
+                />
+              }
               text="Home"
               href="/"
               active
+              changeRoute={changeRoute}
+              memberId={memberId}
+              isDarkBackground={isDarkBackground}
             />
             <NavItem
-              icon={<Users className="h-5 w-5 text-white" />}
+              icon={
+                <Users
+                  className={`h-5 w-5 ${
+                    changeRoute === "/member" ||
+                    changeRoute === "/settings" ||
+                    changeRoute === "/settings/changepassword" ||
+                    changeRoute === `/members/${memberId}` ||
+                    changeRoute === "/messages"
+                      ? "text-rose-600"
+                      : isDarkBackground
+                      ? "text-white"
+                      : "text-rose-600"
+                  }`}
+                />
+              }
               text="Members"
               href="/member"
+              changeRoute={changeRoute}
+              memberId={memberId}
+              isDarkBackground={isDarkBackground}
             />
-            <NavItem
-              icon={<BookOpen className="h-5 w-5 text-white" />}
+            {/* <NavItem
+              icon={
+                <BookOpen
+                  className={`h-5 w-5 ${
+                    changeRoute === "/member" || changeRoute === "/settings" || changeRoute === "/settings/changepassword" ||
+        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"
+                      ? "text-rose-600"
+                      : isDarkBackground ? "text-white" : "text-rose-600"
+                  }`}
+                />
+              }
               text="Stories"
               href="/stories"
-            />
-            <NavItem
-              icon={<Star className="h-5 w-5 text-white" />}
+              isDarkBackground={isDarkBackground}
+            /> */}
+            {/* <NavItem
+              icon={
+                <Star
+                  className={`h-5 w-5 ${
+                    changeRoute === "/member" || changeRoute === "/settings" || changeRoute === "/settings/changepassword" ||
+        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"
+                      ? "text-rose-600"
+                      : isDarkBackground ? "text-white" : "text-rose-600"
+                  }`}
+                />
+              }
               text="Reviews"
               href="/reivew"
-            />
+              isDarkBackground={isDarkBackground}
+            /> */}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -83,10 +163,22 @@ export function Navbar() {
               isprofile_complete ? (
                 <div className="flex items-center space-x-4">
                   <button
-                    className="relative p-2 rounded-full hover:bg-pink-50 transition-colors"
+                    className="relative p-2 rounded-full hover:bg-pink-50 transition-colors cursor-pointer"
                     onClick={() => router.push("/messages")}
                   >
-                    <MessageSquare className="h-5 w-5 text-gray-600 hover:text-pink-500 cursor cursor-pointer" />
+                    <MessageSquare
+                      className={`h-5 w-5  hover:text-pink-500 cursor ${
+                        changeRoute === "/member" ||
+                        changeRoute === "/settings" ||
+                        changeRoute === "/settings/changepassword" ||
+                        changeRoute === `/members/${memberId}` ||
+                        changeRoute === "/messages"
+                          ? "text-rose-600"
+                          : isDarkBackground
+                          ? "text-white"
+                          : "text-rose-600"
+                      }`}
+                    />
                     <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center border-2 border-white">
                       3
                     </span>
@@ -176,10 +268,38 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent side="left" className="w-64 bg-white p-6">
                 <div className="space-y-6 mt-10">
-                  <NavItem icon={<Home />} text="Home" href="/" />
-                  <NavItem icon={<Users />} text="Members" href="/member" />
-                  <NavItem icon={<BookOpen />} text="Stories" href="/stories" />
-                  <NavItem icon={<Star />} text="Reviews" href="/review" />
+                  <NavItem
+                    icon={<Home />}
+                    text="Home"
+                    href="/"
+                    isDarkBackground={isDarkBackground}
+                    changeRoute={changeRoute}
+                    memberId={memberId}
+                  />
+                  <NavItem
+                    icon={<Users />}
+                    text="Members"
+                    href="/member"
+                    isDarkBackground={isDarkBackground}
+                    changeRoute={changeRoute}
+                    memberId={memberId}
+                  />
+                  {/* <NavItem
+                    icon={<BookOpen />}
+                    text="Stories"
+                    href="/stories"
+                    isDarkBackground={isDarkBackground}
+                    changeRoute = {changeRoute}
+                     memberId = {memberId}
+                  /> */}
+                  {/* <NavItem
+                    icon={<Star />}
+                    text="Reviews"
+                    href="/review"
+                    isDarkBackground={isDarkBackground}
+                    changeRoute = {changeRoute}
+                    memberId = {memberId}
+                  /> */}
                 </div>
               </SheetContent>
             </Sheet>
@@ -194,11 +314,17 @@ function NavItem({
   icon,
   text,
   href,
+  isDarkBackground = true,
+  changeRoute = "/",
+  memberId,
 }: {
   icon: React.ReactNode;
   text: string;
   active?: boolean;
   href: string;
+  isDarkBackground?: boolean;
+  changeRoute?: string | null;
+  memberId?: string | null;
 }) {
   const pathname = usePathname();
   const active = pathname === href;
@@ -207,7 +333,17 @@ function NavItem({
     <a
       href={href}
       className={`relative group flex items-center px-1 pt-1 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
-        active ? "text-rose-600" : "text-white"
+        active
+          ? "text-rose-600"
+          : changeRoute === "/member" ||
+            changeRoute === "/settings" ||
+            changeRoute === "/settings/changepassword" ||
+            changeRoute === `/members/${memberId}` ||
+            changeRoute === "/messages"
+          ? "text-rose-600"
+          : isDarkBackground
+          ? "text-white"
+          : "text-rose-600"
       }`}
     >
       <span className="mr-2">{icon}</span>

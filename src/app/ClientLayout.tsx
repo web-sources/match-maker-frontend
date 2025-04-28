@@ -6,17 +6,28 @@ import { AuthProvider } from "@/context/AuthContext";
 import { shouldHideLayout } from "./utils/helper/hideLayout";
 import { usePathname } from "next/navigation";
 import { Toaster } from "react-hot-toast";
+import { useEffect, useState } from "react";
 
 function ClientLayout({ children }: { children: React.ReactNode }) {
+
+  const [routeChange, setRouteChange] = useState('');
+
   const pathname = usePathname();
   const shouldHide = shouldHideLayout(pathname);
+
+  console.log(pathname)
+
+  useEffect(() => {
+    setRouteChange(pathname);
+  }, [pathname])
+
 
   return (
     <AuthProvider>
       <Toaster position="top-right" />
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 relative overflow-hidden">
-        {!shouldHide && <Navbar />}
-        <main>
+      <div className="min-h-screen flex flex-col">
+        {!shouldHide && <Navbar changeRoute={routeChange}  />}
+        <main className="flex-1 relative z-0">
           {children}
         </main>
         {!shouldHide && <Footer />}

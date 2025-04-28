@@ -90,10 +90,8 @@ const MemberPage = () => {
     setActiveFilters({});
   };
 
-  console.log(memberData);
-
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8">
+    <div className="container max-w-7xl mx-auto px-4 py-8 mt-15">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-pink-600">Discover Members</h1>
         <MemberFilters onApplyFilters={handleApplyFilters} />

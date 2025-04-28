@@ -54,20 +54,29 @@ export function ShowcaseSection() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    // Preload all images
+    slides.forEach((slide) => {
+      const img = new window.Image();
+      img.src = slide.image;
+    });
+  }, []);
+
   const { image, title, description, buttonText } = slides[currentSlide];
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
+      <div className="absolute inset-0 bg-black z-0" />
+
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentSlide} // key both image and text on the slide index
+          key={currentSlide}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
-          className="absolute inset-0"
+          className="absolute inset-0 z-10"
         >
-          {/* Background Image */}
           <Image
             src={image}
             alt="Romantic background"
