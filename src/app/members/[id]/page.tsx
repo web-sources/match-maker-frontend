@@ -128,7 +128,7 @@ const MemberDetailsPage = () => {
     if (!accessToken) {
       router.push("/login");
     }
-  }, [accessToken]);
+  }, [accessToken, router]);
 
   const calculateAge = (birthDateString: string) => {
     const birthDate = new Date(birthDateString);
@@ -324,10 +324,16 @@ const MemberDetailsPage = () => {
               </div>
 
               <div className="space-y-4">
-                <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Send Message
-                </Button>
+                <Link
+                  href={`/messages/new/${memberId}`}
+                  className="w-full"
+                  passHref
+                >
+                  <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 cursor-pointer">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Send Message
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="w-full border-pink-200 text-pink-600 hover:bg-pink-50"
@@ -454,7 +460,9 @@ const MemberDetailsPage = () => {
                         </span>
                         <span
                           className={`font-medium ${
-                            profile?.smoking ? "text-rose-500" : "text-green-500"
+                            profile?.smoking
+                              ? "text-rose-500"
+                              : "text-green-500"
                           }`}
                         >
                           {profile?.smoking ? "Yes" : "No"}

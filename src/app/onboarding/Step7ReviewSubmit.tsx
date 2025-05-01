@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
   console.log(isEditing, "isEditing");
   const { resetData, data } = useOnboardingStore();
-  const { accessToken, login } = useAuth();
+  const { accessToken, login, userId } = useAuth();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
 
@@ -59,8 +59,6 @@ const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
           }
         );
 
-        console.log(response, "response from api");
-
         if (response.status === 201) {
           toast.success(response.data.data || "Profile Created Succesfully!");
           login(
@@ -68,7 +66,8 @@ const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
             false,
             response.data.is_profile_created,
             false,
-            true
+            true,
+            userId ?? ""
           );
           router.push("/");
         }

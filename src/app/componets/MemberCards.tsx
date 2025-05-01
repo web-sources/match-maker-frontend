@@ -33,11 +33,7 @@ const MemberCards = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 15;
 
-  useEffect(() => {
-    fetchMembers();
-  }, [currentPage, accessToken, isprofile_complete]);
-
-  const fetchMembers = async () => {
+  const fetchMembers = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
@@ -60,7 +56,11 @@ const MemberCards = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [BASE_URL, currentPage, accessToken]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [currentPage, accessToken, isprofile_complete, fetchMembers]);
 
   const handleNextPage = () => {
     setCurrentPage((prev) => prev + 1);
@@ -87,7 +87,7 @@ const MemberCards = () => {
               <p className="text-pink-500 text-sm font-medium">
                 Loading members...
               </p>
-            </div>  
+            </div>
           </div>
         ) : (
           <>
