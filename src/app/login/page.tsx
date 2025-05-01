@@ -74,8 +74,9 @@ export default function LoginPage() {
 
       if (response.status === 200) {
         const access_token = response?.data?.token?.access;
-        const { is_admin, is_vip, is_profile, is_user } = response?.data;
-        login(access_token, is_admin, is_profile, is_vip, is_user);
+        const { is_admin, is_vip, is_profile, is_user, user_id } =
+          response?.data;
+        login(access_token, is_admin, is_profile, is_vip, is_user, user_id);
 
         if (!is_profile) {
           router.push("/onboarding");
@@ -114,7 +115,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex p-2 justify-center relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg-overlay/bg-ol-2.jpg"
+          src="/bg-overlay/bg-oll-2.jpg"
           alt="Happy couple background"
           fill
           className="object-cover"
@@ -241,7 +242,8 @@ export default function LoginPage() {
                       </>
                     ) : (
                       <>
-                        Continue your journey <ArrowRight className="ml-2 h-5 w-5" />
+                        Continue your journey{" "}
+                        <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
                   </Button>

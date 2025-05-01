@@ -24,6 +24,9 @@ import { HeartsBackground } from "../componets/HeartsBackground";
 
 const formSchema = z
   .object({
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
     first_name: z.string().min(2, {
       message: "First name must be at least 2 characters.",
     }),
@@ -56,6 +59,7 @@ const RegisterPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      username: "",
       first_name: "",
       last_name: "",
       email: "",
@@ -169,6 +173,24 @@ const RegisterPage = () => {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">User Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your username"
+                          {...field}
+                          className="focus:ring-2 focus:ring-rose-300 bg-white/70 border-gray-300 rounded-lg py-5 px-4 text-gray-700 placeholder-gray-400 transition-all hover:border-rose-300 focus:border-rose-400"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

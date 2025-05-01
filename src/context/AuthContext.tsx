@@ -9,12 +9,14 @@ type AuthContextType = {
   isvip_user?: boolean;
   is_user?: boolean;
   is_admin?: boolean;
+  userId?: string; // 🆕 userId state;
   login: (
     access: string,
     is_admin: boolean,
     isprofile: boolean,
     isvip: boolean,
-    isuser: boolean
+    isuser: boolean,
+    user_id: string // 🆕 user_id parameter
   ) => void;
   logout: () => void;
   loading: boolean; // 🆕 loading state
@@ -38,8 +40,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [is_user, setIsUser] = useState(false);
   const [is_admin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>("");
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const access = localStorage.getItem("accessToken");
@@ -62,13 +65,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     is_admin: boolean,
     isprofile: boolean,
     isvip: boolean,
-    isuser: boolean
+    isuser: boolean,
+    user_id: string // 🆕 user_id parameter
   ) => {
     setAccessToken(access);
     setIsAdmin(is_admin);
     setIsProfileComplete(isprofile);
     setIsVipUser(isvip);
     setIsUser(isuser);
+    setUserId(user_id); // 🆕 set user_id in state
     localStorage.setItem("accessToken", access);
     localStorage.setItem("is_profile_compeleted", isprofile.toString());
   };
@@ -90,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         logout,
         loading,
+        userId,
       }}
     >
       {children}

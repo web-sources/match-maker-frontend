@@ -6,39 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
+import axios from "axios";
+import { useWebSocket } from "@/context/WebSocket";
 
-const mockMessages = [
-  {
-    id: "1",
-    sender: "them",
-    text: "Hey there! How's your day going?",
-    time: "10:30 AM",
-  },
-  {
-    id: "2",
-    sender: "me",
-    text: "Pretty good! Just finished work.",
-    time: "10:32 AM",
-  },
-  {
-    id: "3",
-    sender: "them",
-    text: "Nice! What do you do for work?",
-    time: "10:33 AM",
-  },
-  {
-    id: "4",
-    sender: "me",
-    text: "I'm a graphic designer. How about you?",
-    time: "10:35 AM",
-  },
-  {
-    id: "5",
-    sender: "them",
-    text: "I work in marketing. We should collaborate sometime!",
-    time: "10:36 AM",
-  },
-];
+type Message = {
+  id: string;
+  sender_id: string;
+  sender_email: string;
+  text: string | null;
+  image: string | null;
+  voice_message: string | null;
+  sent_at: string;
+  is_read: boolean;
+  reply_to: string | null;
+  is_sent_by_me: boolean;
+};
 
 export function MessageThread({
   conversationId,
@@ -47,58 +30,89 @@ export function MessageThread({
   conversationId: string;
   onBack: () => void;
 }) {
-  const [messages, setMessages] = useState(mockMessages);
   const [newMessage, setNewMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [conversationDetails, setConversationDetails] = useState<{
+    name: string;
+    avatar: string;
+    online: boolean;
+  } | null>(null);
+  const [apiMessages, setApiMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  console.log(conversationId);
+  const { sendTextMessage, messages, setCurrentConversationId, markAsRead } =
+    useWebSocket();
+  const { accessToken } = useAuth();
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
-    if (messages[messages.length - 1]?.sender === "me") {
-      setIsTyping(true);
-      const timer = setTimeout(() => {
-        setIsTyping(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            sender: "them",
-            text: "That's interesting! Tell me more.",
-            time: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [messages]);
+    setCurrentConversationId(conversationId);
+    markAsRead(conversationId);
+
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // 1. Fetch conversation details
+        const detailsRes = await axios.get(
+          `${BASE_URL}/api/v1/startup/fun/threads/?thread_id=${conversationId}`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+
+        console.log(detailsRes.data[0]);
+
+        setConversationDetails({
+          name: detailsRes.data[0]?.chat_with.first_name,
+          avatar: detailsRes.data[0].chat_with.profile_picture,
+          online: detailsRes.data[0].chat_with.is_online,
+        });
+
+        // 2. Fetch message history
+        const historyRes = await axios.get(
+          `${BASE_URL}/api/v1/startup/fun/chat/${conversationId}/history`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+
+        setApiMessages(historyRes.data.results);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      setCurrentConversationId(null);
+    };
+  }, [conversationId, accessToken, setCurrentConversationId, markAsRead, BASE_URL]);
 
   const handleSend = () => {
     if (newMessage.trim()) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          sender: "me",
-          text: newMessage,
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+      sendTextMessage(newMessage, conversationId);
       setNewMessage("");
     }
   };
 
+  const allMessages = [
+    ...apiMessages,
+    ...(messages[conversationId] || []),
+  ].sort(
+    (a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
+  );
+
+  useEffect(() => {
+    messagesContainerRef.current?.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [allMessages]);
+
   useEffect(() => {
     const scrollToBottom = () => {
       if (messagesContainerRef.current) {
-        messagesContainerRef.current.scrollTop = 
+        messagesContainerRef.current.scrollTop =
           messagesContainerRef.current.scrollHeight;
       }
     };
@@ -107,8 +121,16 @@ export function MessageThread({
     return () => clearTimeout(timer);
   }, [messages]);
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <p>Loading conversation...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full pt-15">
       {/* Header - fixed height */}
       <div className="p-4 border-b border-gray-200 flex items-center">
         <Button
@@ -121,79 +143,58 @@ export function MessageThread({
         </Button>
         <div className="flex items-center">
           <Avatar className="h-10 w-10 mr-3">
-            <AvatarImage src="/avatars/alex.jpg" />
-            <AvatarFallback>A</AvatarFallback>
+            <AvatarImage
+              src={conversationDetails?.avatar || "/default-avatar.jpg"}
+            />
+            <AvatarFallback>
+              {conversationDetails?.name?.charAt(0) || "U"}
+            </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-medium">Alex Johnson</h3>
-            <p className="text-xs text-gray-500">Online now</p>
+            <h3 className="font-medium">
+              {conversationDetails?.name || "Unknown User"}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {conversationDetails?.online ? "Online" : "Offline"}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Messages container - flexible space */}
-      <div 
+      {/* Messages */}
+      <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
       >
-        {messages.map((msg) => (
+        {allMessages.map((msg, index) => (
           <div
-            key={msg.id}
+            key={index}
             className={`flex ${
-              msg.sender === "me" ? "justify-end" : "justify-start"
+              msg.is_sent_by_me ? "justify-end" : "justify-start"
             }`}
           >
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`max-w-xs md:max-w-md rounded-lg px-4 py-2 ${
-                msg.sender === "me"
+                msg.is_sent_by_me
                   ? "bg-pink-500 text-white rounded-br-none"
                   : "bg-gray-100 text-gray-900 rounded-bl-none"
               }`}
             >
-              <p>{msg.text}</p>
+              {msg.text && <p>{msg.text}</p>}
               <p
                 className={`text-xs mt-1 ${
-                  msg.sender === "me" ? "text-pink-100" : "text-gray-500"
+                  msg.is_sent_by_me ? "text-pink-100" : "text-gray-500"
                 }`}
-              >
-                {msg.time}
-              </p>
+              ></p>
             </motion.div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Typing indicator */}
-      {isTyping && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="px-4 py-2 text-sm text-gray-500"
-        >
-          <div className="flex items-center">
-            <div className="flex space-x-1 mr-2">
-              <div
-                className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
-                style={{ animationDelay: "0ms" }}
-              />
-              <div
-                className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
-                style={{ animationDelay: "150ms" }}
-              />
-              <div
-                className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
-                style={{ animationDelay: "300ms" }}
-              />
-            </div>
-            <span>Alex is typing...</span>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Input area - fixed height */}
+      {/* Input area */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex gap-2">
           <Input

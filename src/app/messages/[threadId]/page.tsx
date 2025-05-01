@@ -3,9 +3,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ConversationList } from "./components/ConversationList";
-import { MessageThread } from "./components/MessageThread";
-import { EmptyState } from "./components/EmptyState";
+import { ConversationList } from "../components/ConversationList";
+import { MessageThread } from "../components/MessageThread";
+import { EmptyState } from "../components/EmptyState";
 
 export default function MessagesLayout() {
   const [activeConversation, setActiveConversation] = useState<string | null>(
@@ -14,7 +14,7 @@ export default function MessagesLayout() {
   const router = useRouter();
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl h-[calc(100vh-64px)] overflow-hidden">
+    <div className="px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl h-[calc(100vh-64px)] overflow-hidden mt-15">
       <div className="flex h-full bg-white rounded-xl shadow-md overflow-hidden">
         {/* Conversation List Sidebar */}
         <div
@@ -27,9 +27,9 @@ export default function MessagesLayout() {
 
         {/* Main Message Area */}
         <div className="flex-1 w-full">
-          {activeConversation ? (
+          {true ? (
             <MessageThread
-              conversationId={activeConversation}
+              conversationId={"1"}
               onBack={() => setActiveConversation(null)}
             />
           ) : (
