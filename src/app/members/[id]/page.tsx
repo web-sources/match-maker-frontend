@@ -324,11 +324,7 @@ const MemberDetailsPage = () => {
               </div>
 
               <div className="space-y-4">
-                <Link
-                  href={`/messages/new/${memberId}`}
-                  className="w-full"
-                  passHref
-                >
+                <Link href={`/messages?recipient=${memberId}`} className="w-full" passHref>
                   <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 cursor-pointer">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Send Message

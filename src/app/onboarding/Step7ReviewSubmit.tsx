@@ -24,13 +24,11 @@ const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
+              "Content-Type": "multipart/form-data",
+              Accept: "*/*",
             },
           }
         );
-
-        console.log(response, "response from api");
 
         if (response.status === 200) {
           toast.success(response.data.data || "Profile Updated Succesfully!");
@@ -53,8 +51,8 @@ const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
+              "Content-Type": "multipart/form-data",
+              Accept: "*/*",
             },
           }
         );

@@ -8,6 +8,9 @@ import Step1BasicInfo from "@/app/onboarding/Step1BasicInfo";
 import Step3Preferences from "@/app/onboarding/Step3Preferences";
 import Step5Intimacy from "@/app/onboarding/Step5Intimacy";
 import Step7ReviewSubmit from "@/app/onboarding/Step7ReviewSubmit";
+import Step2PhysicalInfo from "@/app/onboarding/Step2PhysicalInfo";
+import Step4Languages from "@/app/onboarding/Step4Languages";
+import Step6ProfileImage from "@/app/onboarding/Step6ProfileImage";
 
 const ProfileSliderWrapper = () => {
   return (
@@ -21,10 +24,19 @@ const ProfileSliderWrapper = () => {
         className="h-full"
       >
         <SwiperSlide>
-          <Step1BasicInfo isEditing={true} />
+          <Step6ProfileImage isEditing={true} />
+        </SwiperSlide>
+        <SwiperSlide>
+          <Step1BasicInfo />
+        </SwiperSlide>
+        <SwiperSlide>
+          <Step2PhysicalInfo isEditing={true} />
         </SwiperSlide>
         <SwiperSlide>
           <Step3Preferences isEditing={true} />
+        </SwiperSlide>
+        <SwiperSlide>
+          <Step4Languages isEditing={true} />
         </SwiperSlide>
         <SwiperSlide>
           <Step5Intimacy isEditing={true} />

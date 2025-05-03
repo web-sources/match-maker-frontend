@@ -61,7 +61,8 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
         changeRoute === "/settings" ||
         changeRoute === "/settings/changepassword" ||
         changeRoute === `/members/${memberId}` ||
-        changeRoute === "/messages"
+        changeRoute === "/messages" ||
+        changeRoute === "/profile"
           ? "bg-white"
           : isDarkBackground
           ? "bg-white/5 border-white/20" // Scrolling logic
@@ -89,7 +90,8 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                     changeRoute === "/settings" ||
                     changeRoute === "/settings/changepassword" ||
                     changeRoute === `/members/${memberId}` ||
-                    changeRoute === "/messages"
+                    changeRoute === "/messages" ||
+                    changeRoute === "/profile"
                       ? "text-rose-600"
                       : isDarkBackground
                       ? "text-white"
@@ -112,7 +114,8 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                     changeRoute === "/settings" ||
                     changeRoute === "/settings/changepassword" ||
                     changeRoute === `/members/${memberId}` ||
-                    changeRoute === "/messages"
+                    changeRoute === "/messages" ||
+                    changeRoute === "/profile"
                       ? "text-rose-600"
                       : isDarkBackground
                       ? "text-white"
@@ -131,7 +134,7 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                 <BookOpen
                   className={`h-5 w-5 ${
                     changeRoute === "/member" || changeRoute === "/settings" || changeRoute === "/settings/changepassword" ||
-        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"
+        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"|| changeRoute === "/profile"
                       ? "text-rose-600"
                       : isDarkBackground ? "text-white" : "text-rose-600"
                   }`}
@@ -146,7 +149,7 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                 <Star
                   className={`h-5 w-5 ${
                     changeRoute === "/member" || changeRoute === "/settings" || changeRoute === "/settings/changepassword" ||
-        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"
+        changeRoute === `/members/${memberId}` ||  changeRoute === "/messages"|| changeRoute === "/profile"
                       ? "text-rose-600"
                       : isDarkBackground ? "text-white" : "text-rose-600"
                   }`}
@@ -172,7 +175,8 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                         changeRoute === "/settings" ||
                         changeRoute === "/settings/changepassword" ||
                         changeRoute === `/members/${memberId}` ||
-                        changeRoute === "/messages"
+                        changeRoute === "/messages" ||
+                        changeRoute === "/profile"
                           ? "text-rose-600"
                           : isDarkBackground
                           ? "text-white"
@@ -339,7 +343,8 @@ function NavItem({
             changeRoute === "/settings" ||
             changeRoute === "/settings/changepassword" ||
             changeRoute === `/members/${memberId}` ||
-            changeRoute === "/messages"
+            changeRoute === "/messages" ||
+            changeRoute === "/profile"
           ? "text-rose-600"
           : isDarkBackground
           ? "text-white"

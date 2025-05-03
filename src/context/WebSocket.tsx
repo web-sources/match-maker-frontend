@@ -30,78 +30,102 @@ type WebSocketContextType = {
   markAsRead: (conversationId: string) => void;
 };
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(
+  undefined
+);
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const BASE_WS_URL = process.env.NEXT_PUBLIC_BASE_URL || "ws://127.0.0.1:8000";
 
-  const [messages, setMessages] = useState<Record<string, WebSocketMessage[]>>({});
+  const [messages, setMessages] = useState<Record<string, WebSocketMessage[]>>(
+    {}
+  );
   const [isConnected, setIsConnected] = useState(false);
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | null
+  >(null);
+
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentConversationIdRef = useRef<string | null>(null);
 
-  const connectWebSocket = useCallback((conversationId: string) => {
-    if (!accessToken || !conversationId) return;
+  const connectWebSocket = useCallback(
+    (conversationId: string) => {
+      console.log("Connecting to WebSocket for conversation:", conversationId);
+      if (!accessToken || !conversationId) return;
 
-    if (socketRef.current) {
-      socketRef.current.close();
-    }
-
-    const wsUrl = `${BASE_WS_URL.replace(/^http/, "ws")}/my-ws/chat/${conversationId}/?token=${accessToken}`;
-    const ws = new WebSocket(wsUrl);
-    socketRef.current = ws;
-
-    ws.onopen = () => {
-      setIsConnected(true);
-      console.log("WebSocket connected");
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        if(data.is_sent_by_me) return;
-
-        setMessages((prev) => ({
-          ...prev,
-          [conversationId]: [
-            ...(prev[conversationId] || []),
-            {
-              id: data.id,
-              sender_id: data.sender_id,
-              text: data.text,
-              sent_at: data.sent_at,
-              is_read: data.is_read,
-              is_sent_by_me: data.is_sent_by_me,
-            },
-          ],
-        }));
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+      if (
+        socketRef.current &&
+        currentConversationIdRef.current === conversationId &&
+        socketRef.current.readyState === WebSocket.OPEN
+      ) {
+        return;
       }
-    };
 
-    ws.onclose = () => {
-      setIsConnected(false);
-      console.log("WebSocket disconnected. Reconnecting...");
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
+      if (socketRef.current) {
+        socketRef.current.close();
       }
-      reconnectTimeoutRef.current = setTimeout(() => {
-        connectWebSocket(conversationId);
-      }, 3000);
-    };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-  }, [accessToken, BASE_WS_URL]);
+      const wsUrl = `${BASE_WS_URL.replace(
+        /^http/,
+        "ws"
+      )}/my-ws/chat/${conversationId}/?token=${accessToken}`;
+      const ws = new WebSocket(wsUrl);
+      socketRef.current = ws;
+      currentConversationIdRef.current = conversationId;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        console.log("WebSocket connected");
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.is_sent_by_me) return;
+
+          setMessages((prev) => ({
+            ...prev,
+            [conversationId]: [
+              ...(prev[conversationId] || []),
+              {
+                id: data.id,
+                sender_id: data.sender_id,
+                text: data.text,
+                sent_at: data.sent_at,
+                is_read: data.is_read,
+                is_sent_by_me: data.is_sent_by_me,
+              },
+            ],
+          }));
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        console.log("WebSocket disconnected. Reconnecting...");
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+        }
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectWebSocket(conversationId);
+        }, 3000);
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+    },
+    [accessToken, BASE_WS_URL]
+  );
 
   useEffect(() => {
     if (currentConversationId) {
+
       connectWebSocket(currentConversationId);
     }
 
@@ -116,35 +140,54 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [currentConversationId, connectWebSocket]);
 
+  // context/websocket.tsx
   const sendTextMessage = useCallback(
     (text: string, conversationId: string) => {
-      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        const messageData = {
-          type: "text_message",
-          text,
-          conversation_id: conversationId,
-        };
-
-        socketRef.current.send(JSON.stringify(messageData));
-
-        // Optimistic update
-        setMessages((prev) => ({
-          ...prev,
-          [conversationId]: [
-            ...(prev[conversationId] || []),
-            {
-              id: Date.now().toString(),
-              sender_id: "", // server should fill this
-              text,
-              sent_at: new Date().toISOString(),
-              is_read: false,
-              is_sent_by_me: true,
-            },
-          ],
-        }));
+      // Ensure we're connected to the right conversation
+      if (
+        currentConversationIdRef.current !== conversationId ||
+        !socketRef.current ||
+        socketRef.current.readyState !== WebSocket.OPEN
+      ) {
+        connectWebSocket(conversationId);
       }
+
+      // Add a small delay to ensure connection is ready
+      const sendMessage = () => {
+        if (
+          socketRef.current &&
+          socketRef.current.readyState === WebSocket.OPEN
+        ) {
+          const messageData = {
+            type: "text_message",
+            text,
+            conversation_id: conversationId,
+          };
+          socketRef.current.send(JSON.stringify(messageData));
+
+          // Optimistic update
+          setMessages((prev) => ({
+            ...prev,
+            [conversationId]: [
+              ...(prev[conversationId] || []),
+              {
+                id: Date.now().toString(),
+                sender_id: "",
+                text,
+                sent_at: new Date().toISOString(),
+                is_read: false,
+                is_sent_by_me: true,
+              },
+            ],
+          }));
+        } else {
+          setTimeout(sendMessage, 100); // Retry after short delay
+        }
+      };
+
+      sendMessage();
     },
-    []
+    [connectWebSocket]
   );
 
   const markAsRead = useCallback((conversationId: string) => {

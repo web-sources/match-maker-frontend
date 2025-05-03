@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const access = localStorage.getItem("accessToken");
-
     const isprofile = localStorage.getItem("is_profile_compeleted");
 
     if (access) {
