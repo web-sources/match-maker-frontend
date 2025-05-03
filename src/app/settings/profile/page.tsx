@@ -56,6 +56,7 @@ export default function ProfileSettings() {
             kinks: response.data.kinks,
             ideal_first_date: response.data.ideal_first_date,
             love_language: response.data.love_language,
+            profile_picture: response.data.profile_picture_url,
           });
 
           setIsLoading(false);
@@ -91,7 +92,7 @@ export default function ProfileSettings() {
     <div className="relative w-full min-h-screen overflow-hidden bg-gradient-to-b from-pink-50 via-white to-blue-50">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg-overlay/bg-ol-11.jpg"
+          src="/bg-overlay/bg-oll-11.jpg"
           alt="Happy couple background"
           fill
           className="object-cover"

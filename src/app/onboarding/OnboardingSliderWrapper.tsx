@@ -11,6 +11,7 @@ import Step5Intimacy from "./Step5Intimacy";
 import Step7ReviewSubmit from "./Step7ReviewSubmit";
 import Step2PhysicalInfo from "./Step2PhysicalInfo";
 import Step4Languages from "./Step4Languages";
+import Step6ProfileImage from "./Step6ProfileImage";
 
 const OnboardingSliderWrapper = () => {
   return (
@@ -25,6 +26,9 @@ const OnboardingSliderWrapper = () => {
           slidesPerView={1}
           className="h-full"
         >
+           <SwiperSlide>
+          <Step6ProfileImage />
+        </SwiperSlide>
           <SwiperSlide>
             <Step1BasicInfo />
           </SwiperSlide>

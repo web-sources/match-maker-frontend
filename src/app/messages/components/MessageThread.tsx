@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Smile } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { useWebSocket } from "@/context/WebSocket";
+import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react"; // Import emoji picker and Theme type
 
 type Message = {
   id: string;
@@ -44,22 +45,43 @@ export function MessageThread({
     useWebSocket();
   const { accessToken } = useAuth();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setNewMessage((prev) => prev + emojiData.emoji);
+  };
 
   useEffect(() => {
-    setCurrentConversationId(conversationId);
-    markAsRead(conversationId);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!conversationId || !accessToken) return;
 
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        setCurrentConversationId(conversationId);
+        markAsRead(conversationId);
 
         // 1. Fetch conversation details
         const detailsRes = await axios.get(
           `${BASE_URL}/api/v1/startup/fun/threads/?thread_id=${conversationId}`,
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
-
-        console.log(detailsRes.data[0]);
 
         setConversationDetails({
           name: detailsRes.data[0]?.chat_with.first_name,
@@ -84,23 +106,40 @@ export function MessageThread({
     fetchData();
 
     return () => {
-      setCurrentConversationId(null);
-    };
-  }, [conversationId, accessToken, setCurrentConversationId, markAsRead, BASE_URL]);
+      const isUnmounting = true;
 
-  const handleSend = () => {
+      if (!isUnmounting) {
+        setCurrentConversationId(null);
+      }
+    };
+  }, [
+    conversationId,
+    accessToken,
+    setCurrentConversationId,
+    markAsRead,
+    BASE_URL,
+  ]);
+
+  const handleBack = useCallback(() => {
+    // Clear conversation immediately
+    setCurrentConversationId(null);
+
+    // Then navigate back
+    onBack();
+  }, [onBack, setCurrentConversationId]);
+
+  const handleSend = useCallback(() => {
     if (newMessage.trim()) {
       sendTextMessage(newMessage, conversationId);
       setNewMessage("");
     }
-  };
+  }, [newMessage, conversationId, sendTextMessage]);
 
-  const allMessages = [
-    ...apiMessages,
-    ...(messages[conversationId] || []),
-  ].sort(
-    (a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
-  );
+  const allMessages = useMemo(() => {
+    return [...apiMessages, ...(messages[conversationId] || [])].sort(
+      (a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
+    );
+  }, [apiMessages, messages, conversationId]);
 
   useEffect(() => {
     messagesContainerRef.current?.scrollTo({
@@ -137,7 +176,7 @@ export function MessageThread({
           variant="ghost"
           size="icon"
           className="md:hidden mr-2"
-          onClick={onBack}
+          onClick={handleBack}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -183,33 +222,52 @@ export function MessageThread({
               }`}
             >
               {msg.text && <p>{msg.text}</p>}
-              <p
-                className={`text-xs mt-1 ${
-                  msg.is_sent_by_me ? "text-pink-100" : "text-gray-500"
-                }`}
-              ></p>
             </motion.div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 relative">
         <div className="flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-          />
+          <div className="relative flex-1">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <Smile className="h-5 w-5" />
+            </button>
+          </div>
           <Button onClick={handleSend}>Send</Button>
         </div>
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className="absolute bottom-16 left-4 z-10">
+            <EmojiPicker
+              onEmojiClick={handleEmojiClick}
+              width={300}
+              height={350}
+              previewConfig={{ showPreview: false }}
+              skinTonesDisabled
+              searchDisabled
+              theme={Theme.LIGHT} // or Theme.DARK based on your theme
+              lazyLoadEmojis
+            />
+          </div>
+        )}
       </div>
     </div>
   );

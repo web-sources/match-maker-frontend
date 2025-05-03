@@ -20,18 +20,19 @@ function ClientLayout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-      <AuthProvider>
-    <WebSocketProvider>
+    <AuthProvider>
+      <WebSocketProvider>
         <Toaster position="top-right" />
         <div className="min-h-screen flex flex-col">
           {!shouldHide && <Navbar changeRoute={routeChange} />}
           <main className="flex-1 relative z-0">{children}</main>
-          {pathname !== "/login" && pathname !== "/messages" && pathname !== "/register" && !shouldHide && (
-            <Footer />
-          )}
+          {pathname !== "/login" &&
+            pathname !== "/messages" &&
+            pathname !== "/register" &&
+            !shouldHide && <Footer />}
         </div>
-    </WebSocketProvider>
-      </AuthProvider>
+      </WebSocketProvider>
+    </AuthProvider>
   );
 }
 

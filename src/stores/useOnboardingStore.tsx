@@ -2,6 +2,7 @@
 import { create } from "zustand";
 
 type OnboardingData = {
+  profile_picture?: File | null;
   date_of_birth?: string;
   gender?: string;
   sexual_orientation?: string;

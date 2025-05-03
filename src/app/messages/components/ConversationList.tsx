@@ -22,8 +22,10 @@ type ThreadType = {
 
 export function ConversationList({
   onSelect,
+  activeConversation,
 }: {
   onSelect: (id: string) => void;
+  activeConversation: string | null;
 }) {
   const [threadList, setthreadList] = useState<ThreadType[]>([]);
   const { accessToken } = useAuth();
@@ -114,12 +116,14 @@ export function ConversationList({
               <div
                 key={convo.id}
                 onClick={() => convo.id && onSelect(convo.id)}
-                className="flex items-center p-4 hover:bg-pink-50 cursor-pointer transition-colors"
+                className={`flex items-center p-4 hover:bg-pink-50 cursor-pointer transition-colors ${
+                  activeConversation === convo.id ? "bg-pink-50" : ""
+                }`}
               >
                 <div className="relative mr-3">
                   <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src="/member/member-1.jpg" />
+                      <AvatarImage src={convo?.avatar} />
                       <AvatarFallback>{convo.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     {convo.online && (
