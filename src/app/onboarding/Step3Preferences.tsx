@@ -56,7 +56,6 @@ const Step3Preferences = ({ isEditing = false }: { isEditing?: boolean }) => {
       ...rest,
     };
 
-    console.log(payload, "values from step 3");
     updateData(payload);
     document
       .querySelector(".swiper-button-next")

@@ -7,35 +7,35 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const slides = [
   {
-    image: "/bg-overlay/bg-oll-12.jpg",
+    image: "/bg-overlay/bg-ol-12.jpg",
     title: "Find Your Perfect Match",
     description:
       "Join thousands of happy couples who found love through our app. It's time to write your own love story!",
     buttonText: "Start Your Journey",
   },
   {
-    image: "/bg-overlay/bg-oll-11.jpg",
+    image: "/bg-overlay/bg-ol-11.jpg",
     title: "Love Knows No Distance",
     description:
       "Whether near or far, love is just a heartbeat away. Discover meaningful connections today!",
     buttonText: "Discover Connections",
   },
   {
-    image: "/bg-overlay/bg-oll-5.jpg",
+    image: "/bg-overlay/bg-ol-5.jpg",
     title: "Your Happily Ever After Begins Here",
     description:
       "Every great story starts with a hello. Find someone special and write your next chapter.",
     buttonText: "Begin Your Story",
   },
   {
-    image: "/bg-overlay/bg-oll-8.jpg",
+    image: "/bg-overlay/bg-ol-8.jpg",
     title: "Spark Meaningful Connections",
     description:
       "True love starts with a simple conversation. Take the first step toward your beautiful journey today.",
     buttonText: "Start Chatting",
   },
   {
-    image: "/bg-overlay/bg-oll-7.jpg",
+    image: "/bg-overlay/bg-ol-7.jpg",
     title: "Love is Just a Click Away",
     description:
       "Find someone who makes your heart smile. Explore endless possibilities and real connections now.",

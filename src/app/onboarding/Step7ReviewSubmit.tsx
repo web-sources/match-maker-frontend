@@ -9,7 +9,6 @@ import toast from "react-hot-toast";
 
 // Step 7: Review and Submit (with Terms and Conditions)
 const Step7ReviewSubmit = ({ isEditing = false }: { isEditing?: boolean }) => {
-  console.log(isEditing, "isEditing");
   const { resetData, data } = useOnboardingStore();
   const { accessToken, login, userId } = useAuth();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
