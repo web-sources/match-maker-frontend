@@ -99,7 +99,7 @@ const RegisterPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex p-4 justify-center relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg-overlay/bg-oll-12.jpg"
+          src="/bg-overlay/bg-ol-12.jpg"
           alt="Happy couple background"
           fill
           className="object-cover"

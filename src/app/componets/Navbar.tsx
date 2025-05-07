@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Heart,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,9 +28,10 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
+import { usePresence } from "../hooks/usePresence";
 
 export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
-  const { accessToken, logout, isprofile_complete } = useAuth();
+  const { accessToken, logout, isprofile_complete, userProfile } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isDarkBackground, setIsDarkBackground] = useState(true);
@@ -37,6 +39,9 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
 
   const pathParts = pathname.split("/");
   const memberId = pathParts.length > 2 ? pathParts[2] : null;
+
+  const { isOnline } = usePresence();
+
 
   useEffect(() => {
     setMounted(true);
@@ -192,12 +197,25 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="focus:outline-none">
-                        <Avatar className="h-9 w-9 cursor-pointer border-2 border-pink-200 hover:border-pink-300 transition-all hover:scale-105">
-                          <AvatarImage src={"/default-avatar.jpg"} />
-                          <AvatarFallback className="bg-pink-100 text-pink-600">
-                            {"U"}
-                          </AvatarFallback>
-                        </Avatar>
+                        {userProfile ? (
+                          <Avatar className="h-9 w-9 cursor-pointer border-2 border-pink-200 hover:border-pink-300 transition-all hover:scale-105">
+                            <AvatarImage
+                              src={
+                                userProfile?.profile_picture_url ||
+                                "/default-avatar.jpg"
+                              }
+                            />
+                            <AvatarFallback className="bg-pink-100 text-pink-600">
+                              {userProfile?.full_name
+                                ?.charAt(0)
+                                .toUpperCase() || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <div className="h-9 w-9 flex items-center justify-center border-2 border-pink-200 rounded-full animate-spin">
+                            <Loader2 className="h-5 w-5 text-pink-500" />
+                          </div>
+                        )}
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -237,6 +255,22 @@ export function Navbar({ changeRoute = "/" }: { changeRoute?: string | null }) {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+
+                  <div className="presence-indicator flex items-center space-x-2 text-sm font-medium">
+                    {!isOnline ? (
+                      <span className="text-gray-400">Checking...</span>
+                    ) : isOnline ? (
+                      <span className="flex items-center text-green-500">
+                        <span className="h-2.5 w-2.5 rounded-full bg-green-500 mr-1.5"></span>
+                        Online
+                      </span>
+                    ) : (
+                      <span className="flex items-center text-gray-400">
+                        <span className="h-2.5 w-2.5 rounded-full bg-gray-400 mr-1.5"></span>
+                        Offline
+                      </span>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <Button

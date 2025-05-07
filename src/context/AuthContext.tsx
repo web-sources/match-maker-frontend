@@ -1,7 +1,16 @@
 "use client";
 
+import axios, { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useState, useEffect } from "react";
+
+type UserProfile = {
+  id: string;
+  user_id: string;
+  full_name: string;
+  last_seen: string;
+  profile_picture_url: string | null;
+};
 
 type AuthContextType = {
   accessToken: string;
@@ -9,17 +18,18 @@ type AuthContextType = {
   isvip_user?: boolean;
   is_user?: boolean;
   is_admin?: boolean;
-  userId?: string; // 🆕 userId state;
+  userId?: string;
+  userProfile?: UserProfile | null;
   login: (
     access: string,
     is_admin: boolean,
     isprofile: boolean,
     isvip: boolean,
     isuser: boolean,
-    user_id: string // 🆕 user_id parameter
+    user_id: string
   ) => void;
   logout: () => void;
-  loading: boolean; // 🆕 loading state
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,7 +40,7 @@ const AuthContext = createContext<AuthContextType>({
   is_admin: false,
   login: () => {},
   logout: () => {},
-  loading: true, // 🆕 loading state
+  loading: true,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -41,8 +51,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [is_admin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ;
   const router = useRouter();
+
+  const fetchUserProfile = async (token: string) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/v1/startup/fun/common/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      setUserProfile(response.data);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error("Error fetching user profile:", error.message);
+      }
+    }
+  };
 
   useEffect(() => {
     const access = localStorage.getItem("accessToken");
@@ -50,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (access) {
       setAccessToken(access);
+      fetchUserProfile(access);
     }
 
     if (isprofile) {
@@ -65,21 +95,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isprofile: boolean,
     isvip: boolean,
     isuser: boolean,
-    user_id: string // 🆕 user_id parameter
+    user_id: string
   ) => {
     setAccessToken(access);
     setIsAdmin(is_admin);
     setIsProfileComplete(isprofile);
     setIsVipUser(isvip);
     setIsUser(isuser);
-    setUserId(user_id); // 🆕 set user_id in state
+    setUserId(user_id);
     localStorage.setItem("accessToken", access);
     localStorage.setItem("is_profile_compeleted", isprofile.toString());
+
+    fetchUserProfile(access);
   };
 
   const logout = () => {
     localStorage.clear();
     setAccessToken("");
+    setUserProfile(null);
     router.push("/login");
   };
 
@@ -95,6 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         logout,
         loading,
         userId,
+        userProfile,
       }}
     >
       {children}

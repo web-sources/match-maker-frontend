@@ -47,7 +47,7 @@ const OnboardingPage = () => {
 
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg-overlay/bg-oll-11.jpg"
+          src="/bg-overlay/bg-ol-11.jpg"
           alt="Happy couple background"
           fill
           className="object-cover"

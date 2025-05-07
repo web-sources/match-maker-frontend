@@ -76,7 +76,6 @@ const MemberPage = () => {
   }, [router, BASE_URL, accessToken]);
 
   const handleApplyFilters = (filters: MemberFiltersProps) => {
-    console.log("Applying filters:", filters);
     setActiveFilters(filters);
   };
 

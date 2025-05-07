@@ -50,7 +50,6 @@ const Step5Intimacy = ({ isEditing = false }: { isEditing?: boolean }) => {
 
   const onSubmit = (values: FormData) => {
     updateData(values);
-    console.log(values, "values from step 5");
     document
       .querySelector(".swiper-button-next")
       ?.dispatchEvent(new Event("click"));

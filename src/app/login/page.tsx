@@ -115,7 +115,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 flex p-2 justify-center relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/bg-overlay/bg-oll-2.jpg"
+          src="/bg-overlay/bg-ol-2.jpg"
           alt="Happy couple background"
           fill
           className="object-cover"

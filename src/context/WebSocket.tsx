@@ -21,6 +21,14 @@ type WebSocketMessage = {
   is_sent_by_me: boolean;
 };
 
+type UserStatus = {
+  type: string;
+  user_id: string;
+  name: string;
+  is_online: boolean;
+  last_seen: string | null;
+};
+
 type WebSocketContextType = {
   sendTextMessage: (text: string, conversationId: string) => void;
   messages: Record<string, WebSocketMessage[]>;
@@ -28,6 +36,8 @@ type WebSocketContextType = {
   currentConversationId: string | null;
   setCurrentConversationId: (id: string | null) => void;
   markAsRead: (conversationId: string) => void;
+  userStatuses: Record<string, UserStatus>;
+  presenceSocket: WebSocket | null;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -35,9 +45,8 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 );
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-  const { accessToken } = useAuth();
+  const { accessToken, logout } = useAuth();
   const BASE_WS_URL = process.env.NEXT_PUBLIC_BASE_URL || "ws://127.0.0.1:8000";
-
   const [messages, setMessages] = useState<Record<string, WebSocketMessage[]>>(
     {}
   );
@@ -45,10 +54,89 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [currentConversationId, setCurrentConversationId] = useState<
     string | null
   >(null);
+  const [userStatuses, setUserStatuses] = useState<Record<string, UserStatus>>(
+    {}
+  );
 
   const socketRef = useRef<WebSocket | null>(null);
+  const presenceSocketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const presenceReconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentConversationIdRef = useRef<string | null>(null);
+
+  const presenceReconnectAttempts = useRef(0);
+  const isMountedRef = useRef(true);
+
+  const connectPresenceWebSocket = useCallback(() => {
+    if (!isMountedRef.current || !accessToken) return;
+
+    if (presenceSocketRef.current) {
+      const state = presenceSocketRef.current.readyState;
+      if (state === WebSocket.CONNECTING || state === WebSocket.OPEN) {
+        return;
+      }
+    }
+
+    if (presenceReconnectTimeoutRef.current) {
+      clearTimeout(presenceReconnectTimeoutRef.current);
+      presenceReconnectTimeoutRef.current = null;
+    }
+
+    const wsUrl = `${BASE_WS_URL.replace(
+      /^http/,
+      "ws"
+    )}/my-ws/presence/?token=${accessToken}`;
+    const ws = new WebSocket(wsUrl);
+    presenceSocketRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Presence WebSocket connected");
+      ws.send(JSON.stringify({ type: "presence_update", status: "online" }));
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("Presence WebSocket message:", data);
+        if (data.type === "user_status") {
+          setUserStatuses((prev) => ({
+            ...prev,
+            [data.user_id]: data,
+          }));
+        }
+      } catch (error) {
+        console.error("Error parsing presence message:", error);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("Presence WebSocket disconnected. Reconnecting...");
+
+      if (!isMountedRef.current) return;
+
+      const delay = Math.min(
+        5000 * (presenceReconnectAttempts.current + 1),
+        30000
+      );
+      console.log(`Will attempt reconnect in ${delay}ms`);
+
+      if (presenceReconnectTimeoutRef.current) {
+        clearTimeout(presenceReconnectTimeoutRef.current);
+      }
+      presenceReconnectTimeoutRef.current = setTimeout(() => {
+        presenceReconnectAttempts.current += 1;
+        connectPresenceWebSocket();
+      }, delay);
+    };
+
+    ws.onerror = (error) => {
+      console.error("Presence WebSocket error:", error);
+      // If token is invalid, logout the user
+      if (error) {
+        console.error("Invalid token, logging out...");
+      }
+    };
+  }, [accessToken, BASE_WS_URL, logout]);
 
   const connectWebSocket = useCallback(
     (conversationId: string) => {
@@ -124,12 +212,27 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    if (currentConversationId) {
+    isMountedRef.current = true;
 
-      connectWebSocket(currentConversationId);
+    if (accessToken) {
+      connectPresenceWebSocket();
     }
 
+    /*
+
     return () => {
+      isMountedRef.current = false;
+
+      // Cleanup presence connection
+      if (presenceSocketRef.current) {
+        presenceSocketRef.current.close(1000, "Component unmounting");
+        presenceSocketRef.current = null;
+      }
+      if (presenceReconnectTimeoutRef.current) {
+        clearTimeout(presenceReconnectTimeoutRef.current);
+      }
+
+      // Cleanup chat connection
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
@@ -138,6 +241,13 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
+     */
+  }, [accessToken, connectPresenceWebSocket]);
+
+  useEffect(() => {
+    if (currentConversationId) {
+      connectWebSocket(currentConversationId);
+    }
   }, [currentConversationId, connectWebSocket]);
 
   // context/websocket.tsx
@@ -210,6 +320,8 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         currentConversationId,
         setCurrentConversationId,
         markAsRead,
+        userStatuses,
+        presenceSocket: presenceSocketRef.current,
       }}
     >
       {children}
