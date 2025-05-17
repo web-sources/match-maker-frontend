@@ -10,6 +10,7 @@ export default function Home() {
   return (
     <OnboardingGuard>
       <div>
+        <h1>helklo</h1>
         <ShowcaseSection  />
         <MemberCards  />
         <UIShowcaseSlider />
